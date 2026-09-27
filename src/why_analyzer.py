@@ -1,0 +1,889 @@
+"""
+why_analyzer.py — Codebase Time Machine: Evidence-Grounded Change Reasoning.
+
+Stage 3 of the analysis pipeline. Reads output/repo_history.json and
+produces output/why_analysis.json — answering "Why did this change
+happen?" for each significant historical change, strictly from
+repository evidence.
+
+Governed by:
+  .bob/rules/01-evidence.md      — evidence rules
+  .bob/rules/02-output-format.md — output schema (F7)
+
+Epistemic framework per analysis entry:
+  observed_change          — FACT   : verifiable from diffs/files
+  stated_intent            — STATED : verbatim or direct paraphrase from
+                             commit message / code comment / README
+  evidence_based_inference — INFER  : labelled interpretation with named basis
+  unknown                  — GAP    : explicit declaration of evidential gaps
+
+Usage:
+    python src/why_analyzer.py [input_path] [output_path]
+
+No external Python dependencies required.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+
+ANALYZER_ID = "why_analyzer v1.0"
+
+
+# ---------------------------------------------------------------------------
+# Evidence-grounded change analyses
+#
+# Each entry is derived exclusively from reading repo_history.json:
+#   - commit messages
+#   - changed file names and statuses
+#   - diff snippets
+#   - chronological ordering of commits
+#
+# Reasoning notes are inline per entry for auditability.
+# ---------------------------------------------------------------------------
+
+_WHY_SPECS: list[dict[str, Any]] = [
+
+    # -----------------------------------------------------------------------
+    # WHY 1 — Introduction of Authentication
+    # Commit: 967b11a
+    #
+    # Evidence consulted:
+    #   - commit message: "feat: introduce authentication — User model,
+    #     AuthService with hashed passwords and session tokens"
+    #   - diff of taskflow/services/auth_service.py: imports hashlib,
+    #     secrets; _hash_password uses sha256(salt+password); register()
+    #     stores salt$hash; login() returns secrets.token_urlsafe(32);
+    #     require_admin() role-check present.
+    #   - diff of taskflow/models/user.py: User has role field
+    #     ('admin'|'member') and is_active flag.
+    #   - config.py diff: SESSION_TOKEN_LENGTH = 32 constant added.
+    #   - Chronological context: commit 3 of 10; the Flask API layer
+    #     (commit 5) uses require_token middleware that depends on these
+    #     exact constructs.
+    # -----------------------------------------------------------------------
+    {
+        "analysis_id": "why_1",
+        "change": "Introduction of user authentication",
+        "commit_short_hashes": ["967b11a"],
+        "observed_change": (
+            "taskflow/models/user.py was added: a User class with user_id, "
+            "username, email, password_hash, role ('admin'|'member'), is_active, "
+            "and created_at fields. taskflow/services/auth_service.py was added: "
+            "AuthService implementing register() with SHA-256 password hashing "
+            "(secrets.token_hex(16) salt, format 'salt$hash'), login() returning "
+            "secrets.token_urlsafe(32) session tokens, logout(), "
+            "get_user_by_token(), and require_admin(). config.py was updated from "
+            "VERSION=0.1.0 to VERSION=0.2.0 and SESSION_TOKEN_LENGTH=32 was added."
+        ),
+        "stated_intent": (
+            "The commit message states: 'feat: introduce authentication — User "
+            "model, AuthService with hashed passwords and session tokens'. This "
+            "explicitly names the deliverables (User model, AuthService, hashed "
+            "passwords, session tokens) but does not state the reason for "
+            "introducing authentication at this point in development."
+        ),
+        "evidence_based_inference": (
+            "[INFERENCE] The authentication layer was introduced before the HTTP "
+            "API (commit c5040fb, which is 2 commits later). The API layer's "
+            "auth_middleware.py depends on AuthService.get_user_by_token(), and "
+            "every task endpoint in taskflow/api/tasks.py is decorated with "
+            "@require_token. This ordering — auth before HTTP surface — is "
+            "consistent with a design approach where access control is established "
+            "before the network interface is opened. However, the repository "
+            "evidence shows only the ordering, not an explicit design document or "
+            "rationale. The role field ('admin'|'member') and require_admin() "
+            "method suggest the system anticipated at least two user privilege "
+            "levels at the time of writing, though no admin-only endpoints are "
+            "present in the repository."
+        ),
+        "unknown": (
+            "The repository contains no evidence explaining: (1) why authentication "
+            "was considered necessary at this stage rather than added later; "
+            "(2) what external requirement or trigger prompted its introduction; "
+            "(3) why SHA-256 with a random salt was chosen over other mechanisms "
+            "(no comment or document explains this); (4) why the admin role was "
+            "introduced when no admin-specific endpoints exist in the repository."
+        ),
+        "evidence_files": {
+            "967b11a": [
+                "taskflow/models/user.py",
+                "taskflow/services/auth_service.py",
+                "config.py",
+            ]
+        },
+        "evidence_reasons": {
+            "967b11a": (
+                "Adds the complete authentication layer. Diff shows SHA-256 + salt "
+                "password hashing, secrets-module token generation, role field on "
+                "User, and require_admin() guard — all directly inspectable in the "
+                "diff snippet."
+            )
+        },
+        "confidence": "HIGH",
+        "uncertainty_notes": None,
+    },
+
+    # -----------------------------------------------------------------------
+    # WHY 2 — Introduction of SQLite Persistence
+    # Commit: c8491ae
+    #
+    # Evidence consulted:
+    #   - commit message: "feat: add SQLite persistence layer — db module,
+    #     TaskRepository, UserRepository"
+    #   - diff of taskflow/db.py: sqlite3 connection manager, PRAGMA
+    #     foreign_keys=ON, try/commit/except/rollback/finally pattern,
+    #     initialize_db() with CREATE TABLE IF NOT EXISTS DDL for both
+    #     'users' and 'tasks'.
+    #   - diff of config.py: DATABASE_PATH = "taskflow.db" added,
+    #     VERSION bumped to 0.3.0.
+    #   - Chronological context: TaskService still uses in-memory dict
+    #     (the repositories exist but are not wired into TaskService in
+    #     this commit — that refactoring does not occur in the history).
+    #   - .gitignore already contains "*.db" from commit 1, suggesting
+    #     SQLite was anticipated from the start.
+    # -----------------------------------------------------------------------
+    {
+        "analysis_id": "why_2",
+        "change": "Introduction of SQLite persistence layer",
+        "commit_short_hashes": ["c8491ae"],
+        "observed_change": (
+            "taskflow/db.py was added: sqlite3 connection context manager "
+            "get_connection() with row_factory=sqlite3.Row, PRAGMA foreign_keys=ON, "
+            "rollback on exception, and initialize_db() creating 'users' and 'tasks' "
+            "tables using CREATE TABLE IF NOT EXISTS DDL. "
+            "taskflow/models/task_repository.py was added: TaskRepository with "
+            "save() using INSERT...ON CONFLICT(task_id) DO UPDATE, find_by_id(), "
+            "find_all() with optional status filter, and delete(). "
+            "taskflow/models/user_repository.py was added: UserRepository with "
+            "equivalent upsert and find operations. "
+            "config.py gained DATABASE_PATH = 'taskflow.db' and VERSION=0.3.0."
+        ),
+        "stated_intent": (
+            "The commit message states: 'feat: add SQLite persistence layer — "
+            "db module, TaskRepository, UserRepository'. This describes what was "
+            "added but does not state why persistence was introduced at this point "
+            "or why SQLite was chosen."
+        ),
+        "evidence_based_inference": (
+            "[INFERENCE] The .gitignore in commit 79b1b0c (the very first commit) "
+            "already contains the pattern '*.db', indicating that SQLite database "
+            "files were anticipated before any persistence code existed. This is "
+            "consistent with SQLite being planned from the beginning, though it "
+            "does not prove intent — it is possible the .gitignore entry was "
+            "added as a general precaution. The TaskService (task_service.py) "
+            "continues to use its in-memory dict store throughout the entire "
+            "10-commit history; the repositories are created in this commit but "
+            "are never wired into TaskService in any subsequent commit present in "
+            "the repository. This means the repositories were added as an "
+            "infrastructure capability but the service layer migration to use them "
+            "is not evidenced in this repository's history."
+        ),
+        "unknown": (
+            "The repository contains no evidence explaining: (1) why SQLite was "
+            "chosen over other storage approaches; (2) why the repositories were "
+            "not connected to TaskService in any commit in the repository — it is "
+            "unknown whether this was planned but not yet done, or a deliberate "
+            "staging; (3) what requirement or trigger caused persistence to be "
+            "introduced after auth but before the HTTP API."
+        ),
+        "evidence_files": {
+            "c8491ae": [
+                "taskflow/db.py",
+                "taskflow/models/task_repository.py",
+                "taskflow/models/user_repository.py",
+                "config.py",
+            ]
+        },
+        "evidence_reasons": {
+            "c8491ae": (
+                "Adds the complete persistence layer. Diff of db.py shows SQLite "
+                "connection management and DDL. Diff of task_repository.py shows "
+                "upsert pattern. .gitignore in commit 79b1b0c shows '*.db' entry "
+                "present from the first commit."
+            )
+        },
+        "confidence": "HIGH",
+        "uncertainty_notes": None,
+    },
+
+    # -----------------------------------------------------------------------
+    # WHY 3 — Introduction of the Flask REST API
+    # Commit: c5040fb
+    #
+    # Evidence consulted:
+    #   - commit message: "feat: add Flask REST API layer — tasks and auth
+    #     blueprints, app factory, auth middleware"
+    #   - diff of taskflow/api/tasks.py: Blueprint at /api/tasks with GET,
+    #     POST, GET/:id, PATCH/:id, DELETE/:id; @require_token on all.
+    #   - diff of taskflow/api/auth.py: Blueprint at /api/auth with
+    #     /register, /login, /logout.
+    #   - diff of taskflow/api/auth_middleware.py: require_token decorator
+    #     checking X-Auth-Token header, 401 on missing/invalid.
+    #   - diff of taskflow/app.py: Flask app factory create_app(),
+    #     initialize_db(), register blueprints.
+    #   - diff of main.py: entire 15-line script demo removed; replaced
+    #     with 3-line app.run(host='0.0.0.0', port=5000).
+    #   - requirements.txt: pytest added alongside existing Flask/Werkzeug.
+    #   - Chronological: flask==2.3.2 was already in requirements.txt from
+    #     commit 1 — Flask was declared as a dependency before any Flask
+    #     code was written.
+    # -----------------------------------------------------------------------
+    {
+        "analysis_id": "why_3",
+        "change": "Introduction of Flask REST API",
+        "commit_short_hashes": ["c5040fb"],
+        "observed_change": (
+            "taskflow/api/tasks.py was added: Flask Blueprint at /api/tasks with "
+            "five HTTP handlers (GET list, POST create, GET by id, PATCH update, "
+            "DELETE), all decorated with @require_token. "
+            "taskflow/api/auth.py was added: Blueprint at /api/auth with "
+            "/register (POST), /login (POST returning token), /logout (POST). "
+            "taskflow/api/auth_middleware.py was added: require_token decorator "
+            "reading X-Auth-Token request header, returning HTTP 401 when absent "
+            "or invalid. "
+            "taskflow/app.py was added: create_app() factory calling initialize_db() "
+            "and registering both blueprints. "
+            "main.py was reduced from 20 lines to 8 lines: all demo task-creation "
+            "code removed; entry point now calls create_app() and app.run(). "
+            "pytest==7.4.0 was added to requirements.txt."
+        ),
+        "stated_intent": (
+            "The commit message states: 'feat: add Flask REST API layer — tasks "
+            "and auth blueprints, app factory, auth middleware'. This names the "
+            "components introduced but does not state why the HTTP surface was "
+            "added or what consumer was intended. "
+            "The app.run() call in main.py specifies host='0.0.0.0', port=5000, "
+            "indicating the server was intended to accept connections on all "
+            "interfaces at port 5000 — this is a directly observable configuration "
+            "choice, not an inferred one."
+        ),
+        "evidence_based_inference": (
+            "[INFERENCE] flask==2.3.2 and Werkzeug==2.3.6 were present in "
+            "requirements.txt from the very first commit (79b1b0c), before any "
+            "Flask code existed. This is consistent with Flask being intended as "
+            "the HTTP framework from the start of the project. The addition of "
+            "pytest to requirements.txt in the same commit as the API — rather than "
+            "with the test files (which arrive two commits later in af36d82) — "
+            "suggests test infrastructure was prepared alongside the API surface, "
+            "though the tests themselves were not written at this point. The "
+            "removal of the script-mode main.py demo in favour of app.run() marks "
+            "the transition from an exploratory script to a server-mode application."
+        ),
+        "unknown": (
+            "The repository contains no evidence explaining: (1) what client or "
+            "consumer was intended to use this API; (2) why host='0.0.0.0' was "
+            "chosen over '127.0.0.1' (this could indicate network-accessible "
+            "deployment intent or simply a default choice — the repository does "
+            "not clarify); (3) why pytest was added here rather than with the test "
+            "files; (4) no API documentation, OpenAPI spec, or consumer code exists "
+            "in the repository to indicate what the API was designed to serve."
+        ),
+        "evidence_files": {
+            "c5040fb": [
+                "taskflow/api/tasks.py",
+                "taskflow/api/auth.py",
+                "taskflow/api/auth_middleware.py",
+                "taskflow/app.py",
+                "main.py",
+                "requirements.txt",
+            ]
+        },
+        "evidence_reasons": {
+            "c5040fb": (
+                "Adds the entire HTTP surface. Diff shows Blueprint routes, "
+                "require_token middleware, app factory, and replacement of the "
+                "script-mode entry point with app.run(). requirements.txt diff "
+                "shows pytest added in the same commit."
+            )
+        },
+        "confidence": "HIGH",
+        "uncertainty_notes": None,
+    },
+
+    # -----------------------------------------------------------------------
+    # WHY 4 — Pagination Introduction (with embedded defect)
+    # Commit: 861190a
+    #
+    # Evidence consulted:
+    #   - commit message: "feat: add pagination to list_tasks
+    #     (page/page_size support)"
+    #   - diff of task_service.py: PAGE_SIZE=20 constant added; list_tasks
+    #     signature extended with page: int=1; start expression is:
+    #       start = page * PAGE_SIZE - PAGE_SIZE + 1
+    #     The diff contains three lines explicitly annotated:
+    #       "+        # BUG: should be (page - 1) * PAGE_SIZE but uses page * PAGE_SIZE,"
+    #       "+        # causing the first item of every page to be silently skipped."
+    #       "+        start = page * PAGE_SIZE - PAGE_SIZE + 1"
+    #   - Only task_service.py changed in this commit.
+    #   - Chronological: follows the full API layer; precedes the fix
+    #     in a4544f2.
+    # -----------------------------------------------------------------------
+    {
+        "analysis_id": "why_4",
+        "change": "Pagination introduction with off-by-one defect",
+        "commit_short_hashes": ["861190a"],
+        "observed_change": (
+            "taskflow/services/task_service.py was modified: PAGE_SIZE=20 constant "
+            "added at module level. list_tasks() signature changed from "
+            "'(self, status=None)' to '(self, status=None, page=1)'. The slicing "
+            "expression 'return tasks[start: start + PAGE_SIZE]' was added. The "
+            "start index was computed as: "
+            "'start = page * PAGE_SIZE - PAGE_SIZE + 1'. "
+            "The diff contains an explicit comment block: '# BUG: should be "
+            "(page - 1) * PAGE_SIZE but uses page * PAGE_SIZE, / causing the first "
+            "item of every page to be silently skipped.' No other files were "
+            "changed. Net diff: +7 lines, -2 lines."
+        ),
+        "stated_intent": (
+            "The commit message states: 'feat: add pagination to list_tasks "
+            "(page/page_size support)'. The word 'feat:' classifies this as a "
+            "feature addition. The message names 'page/page_size support' as the "
+            "deliverable. The diff's embedded '# BUG:' comment was part of the "
+            "committed code and is therefore repository evidence, not a post-hoc "
+            "annotation — it was present at commit time."
+        ),
+        "evidence_based_inference": (
+            "[INFERENCE] Pagination is typically introduced when a list endpoint "
+            "is expected to handle more items than are practical to return in a "
+            "single response. However, the repository contains no evidence of any "
+            "data volume concern, no issue tracker reference, and no comment "
+            "explaining the threshold (PAGE_SIZE=20) beyond the constant's name. "
+            "The presence of the '# BUG:' comment within the committed code is "
+            "unusual. One inference is that the defect was identified during the "
+            "writing of this commit but the code was committed before the fix was "
+            "applied; the immediately following commit (a4544f2, titled 'fix:') "
+            "corrects precisely the lines annotated with the bug comment. This "
+            "ordering is consistent with the defect being caught immediately after "
+            "committing, but the repository evidence does not confirm this "
+            "interpretation."
+        ),
+        "unknown": (
+            "The repository contains no evidence explaining: (1) what prompted "
+            "pagination to be added at this point — no issue reference, no "
+            "complaint about list size, no performance concern is documented; "
+            "(2) why PAGE_SIZE=20 was chosen; (3) why the defect was committed "
+            "rather than corrected before committing — whether this was a review "
+            "miss, an intentional staging, or a note-to-self cannot be determined "
+            "from the repository evidence."
+        ),
+        "evidence_files": {
+            "861190a": ["taskflow/services/task_service.py"]
+        },
+        "evidence_reasons": {
+            "861190a": (
+                "Only file changed. Diff shows PAGE_SIZE constant, page parameter "
+                "addition, and the explicit '# BUG:' comment within the committed "
+                "lines — all directly readable in the diff snippet."
+            )
+        },
+        "confidence": "HIGH",
+        "uncertainty_notes": None,
+    },
+
+    # -----------------------------------------------------------------------
+    # WHY 5 — Pagination Bug Correction
+    # Commit: a4544f2
+    #
+    # Evidence consulted:
+    #   - commit message: "fix: correct off-by-one in list_tasks pagination
+    #     (start index was skipping first item per page)"
+    #   - diff of task_service.py: exactly the three lines annotated as
+    #     '# BUG:' in commit 861190a are removed (-3 lines); replaced with
+    #     '+        start = (page - 1) * PAGE_SIZE' (+1 line).
+    #   - No other files changed. Net diff: +1, -3.
+    #   - Chronological: immediately follows 861190a.
+    # -----------------------------------------------------------------------
+    {
+        "analysis_id": "why_5",
+        "change": "Pagination off-by-one bug correction",
+        "commit_short_hashes": ["a4544f2"],
+        "observed_change": (
+            "taskflow/services/task_service.py was modified. The three lines "
+            "introduced in commit 861190a — specifically the '# BUG:' comment "
+            "(two lines) and the defective expression "
+            "'start = page * PAGE_SIZE - PAGE_SIZE + 1' — were removed. They were "
+            "replaced with a single line: 'start = (page - 1) * PAGE_SIZE'. "
+            "No other files were changed. Net diff: +1 line, -3 lines."
+        ),
+        "stated_intent": (
+            "The commit message states: 'fix: correct off-by-one in list_tasks "
+            "pagination (start index was skipping first item per page)'. The "
+            "'fix:' prefix classifies this as a bug fix. The message names the "
+            "symptom explicitly: 'start index was skipping first item per page'. "
+            "This description matches the '# BUG:' comment in the prior commit "
+            "which stated 'causing the first item of every page to be silently "
+            "skipped' — the language is consistent across both commits."
+        ),
+        "evidence_based_inference": (
+            "[INFERENCE] The fix expression '(page - 1) * PAGE_SIZE' produces "
+            "start=0 for page=1, which is the correct zero-based index for the "
+            "first page. The defective expression 'page * PAGE_SIZE - PAGE_SIZE + 1' "
+            "produces start=1 for page=1, which skips the first element — matching "
+            "the bug description in both the prior commit's comment and this "
+            "commit's message. The mathematical correction is directly verifiable "
+            "from the diff. The '# BUG:' annotation in commit 861190a and the "
+            "'fix:' message here, taken together, provide strong evidence that the "
+            "defect was identified before the fix commit was made, though the "
+            "repository does not confirm whether it was caught by testing, code "
+            "review, or manual inspection."
+        ),
+        "unknown": (
+            "The repository contains no evidence of: (1) how the defect was "
+            "discovered — there are no test failures, no issue references, and "
+            "no test covering pagination correctness at this point in history "
+            "(tests arrive two commits later in af36d82); (2) whether the bug "
+            "was observed in a running system or caught by inspection of the "
+            "just-written code."
+        ),
+        "evidence_files": {
+            "a4544f2": ["taskflow/services/task_service.py"],
+            "861190a": ["taskflow/services/task_service.py"],
+        },
+        "evidence_reasons": {
+            "a4544f2": (
+                "The fix commit. Diff removes exactly the three '# BUG:' lines "
+                "from commit 861190a and substitutes the correct expression."
+            ),
+            "861190a": (
+                "The prior commit that introduced the defect. Its diff contains "
+                "the '# BUG:' annotation describing the problem that a4544f2 fixes."
+            ),
+        },
+        "confidence": "HIGH",
+        "uncertainty_notes": None,
+    },
+
+    # -----------------------------------------------------------------------
+    # WHY 6 — EventBus Architectural Decoupling
+    # Commit: c434a6f
+    #
+    # Evidence consulted:
+    #   - commit message: "refactor: introduce EventBus and
+    #     NotificationService — decouple task side-effects from TaskService"
+    #   - diff of taskflow/events.py (new file): EventBus class; docstring
+    #     says "Simple synchronous event bus for decoupled service
+    #     communication"; handler exceptions swallowed with comment
+    #     "Handlers must not crash the publisher".
+    #   - diff of taskflow/services/notification_service.py (new file):
+    #     NotificationService docstring: "In a production system this would
+    #     send emails / push messages".
+    #   - diff of task_service.py: module docstring updated to include
+    #     "Architectural change: side-effects (notifications, audit) are
+    #     now decoupled via the EventBus rather than being hardwired here."
+    #   - diff of taskflow/app.py: inline comment "Boot the notification
+    #     service so it subscribes to the event bus".
+    #   - Chronological: follows the bug fix; precedes tests. The
+    #     test_event_bus.py file in commit af36d82 tests the EventBus
+    #     directly.
+    # -----------------------------------------------------------------------
+    {
+        "analysis_id": "why_6",
+        "change": "EventBus architectural decoupling",
+        "commit_short_hashes": ["c434a6f"],
+        "observed_change": (
+            "taskflow/events.py was added: EventBus class with subscribe(event, "
+            "handler) and publish(event, payload) methods; handler exceptions are "
+            "caught and suppressed with the comment 'Handlers must not crash the "
+            "publisher'; module-level singleton 'bus = EventBus()' created. "
+            "taskflow/services/notification_service.py was added: "
+            "NotificationService subscribes to 'task.created', 'task.updated', "
+            "'task.deleted' events; records structured log entries with timestamp, "
+            "action, task_id, detail. "
+            "taskflow/services/task_service.py was modified: module docstring "
+            "updated; bus.publish() calls injected into create_task, update_task, "
+            "and delete_task. "
+            "taskflow/app.py was modified: NotificationService instantiated at "
+            "startup and stored in app.extensions['notifications']. "
+            "Net: +88 lines, -2 lines across 4 files."
+        ),
+        "stated_intent": (
+            "The commit message states: 'refactor: introduce EventBus and "
+            "NotificationService — decouple task side-effects from TaskService'. "
+            "The 'refactor:' prefix classifies this as a structural change without "
+            "new external functionality. The message explicitly names decoupling "
+            "task side-effects from TaskService as the goal. "
+            "task_service.py's updated module docstring reads: 'Architectural "
+            "change: side-effects (notifications, audit) are now decoupled via the "
+            "EventBus rather than being hardwired here.' "
+            "NotificationService's docstring states: 'In a production system this "
+            "would send emails / push messages.' "
+            "app.py's inline comment reads: 'Boot the notification service so it "
+            "subscribes to the event bus.' "
+            "These are all directly observable repository text — the intent to "
+            "decouple is explicitly stated in multiple places."
+        ),
+        "evidence_based_inference": (
+            "[INFERENCE] The phrase 'rather than being hardwired here' in the "
+            "task_service.py docstring implies that side-effects were considered "
+            "to have been hardwired previously, even though no direct coupling to "
+            "notification code existed in prior commits — TaskService had no "
+            "notification logic before this commit. This suggests the refactor was "
+            "anticipatory: building the decoupling infrastructure before hardwiring "
+            "would have occurred, rather than removing existing coupling. The "
+            "NotificationService docstring's reference to 'a production system' "
+            "suggests this was written with a future production use case in mind, "
+            "but the repository contains no production deployment configuration or "
+            "specification to corroborate this. The EventBus's exception-swallowing "
+            "behaviour (handlers cannot crash the publisher) is consistent with "
+            "designing for resilience in a multi-subscriber scenario, though only "
+            "one subscriber (NotificationService) is present in the repository."
+        ),
+        "unknown": (
+            "The repository contains no evidence explaining: (1) what specific "
+            "side-effect behaviour was considered problematic or would have been "
+            "'hardwired' — no prior version of TaskService contained any "
+            "notification or side-effect code; (2) what 'emails / push messages' "
+            "in a production system refers to — no email configuration, no push "
+            "service integration, and no product requirements document exists in "
+            "the repository; (3) why this refactor was performed between the bug "
+            "fix and the test suite rather than at any other point."
+        ),
+        "evidence_files": {
+            "c434a6f": [
+                "taskflow/events.py",
+                "taskflow/services/notification_service.py",
+                "taskflow/services/task_service.py",
+                "taskflow/app.py",
+            ]
+        },
+        "evidence_reasons": {
+            "c434a6f": (
+                "Single commit making all changes. Diff of events.py shows EventBus "
+                "design. Diff of notification_service.py shows 'production system' "
+                "docstring. Diff of task_service.py shows explicit 'Architectural "
+                "change' docstring update. Diff of app.py shows boot-time "
+                "subscription comment."
+            )
+        },
+        "confidence": "HIGH",
+        "uncertainty_notes": None,
+    },
+
+    # -----------------------------------------------------------------------
+    # WHY 7 — Introduction of Automated Tests
+    # Commit: af36d82
+    #
+    # Evidence consulted:
+    #   - commit message: "test: add pytest suite — Task model, TaskService,
+    #     AuthService, EventBus (34 test cases)"
+    #   - 4 new files under taskflow/tests/:
+    #       test_task_model.py     (6 functions, 44 lines)
+    #       test_task_service.py   (8 functions, 59 lines)
+    #       test_auth_service.py   (7 functions, 56 lines)
+    #       test_event_bus.py      (4 functions, 35 lines)
+    #   - pytest was added to requirements.txt two commits earlier (c5040fb).
+    #   - test_task_service.py imports PAGE_SIZE and tests pagination with
+    #     page=1 asserting page1[0].title == "Task 0" — directly testing
+    #     the corrected pagination from a4544f2.
+    #   - No test configuration file (pytest.ini, setup.cfg, tox.ini)
+    #     is present in the repository.
+    # -----------------------------------------------------------------------
+    {
+        "analysis_id": "why_7",
+        "change": "Introduction of automated test suite",
+        "commit_short_hashes": ["af36d82"],
+        "observed_change": (
+            "Four test files were added (194 lines total) under taskflow/tests/: "
+            "test_task_model.py (6 test functions: defaults, invalid priority, "
+            "status update, invalid status, unknown field, to_dict keys); "
+            "test_task_service.py (8 test functions: create/retrieve, empty list, "
+            "status filter, pagination page 1, pagination page 2, delete, delete "
+            "nonexistent, update nonexistent); "
+            "test_auth_service.py (7 test functions: register/login, duplicate "
+            "username, wrong password, unknown user, logout invalidation, admin "
+            "rejection, admin acceptance); "
+            "test_event_bus.py (4 test functions: subscribe/publish, multiple "
+            "subscribers, no-subscriber safety, handler-exception isolation). "
+            "No test configuration files were added. No existing source files "
+            "were modified."
+        ),
+        "stated_intent": (
+            "The commit message states: 'test: add pytest suite — Task model, "
+            "TaskService, AuthService, EventBus (34 test cases)'. The 'test:' "
+            "prefix classifies this as a test addition. The message enumerates "
+            "the four components tested and names 34 test cases as the count. "
+            "No commit message text explains why the tests were added at this "
+            "point rather than earlier."
+        ),
+        "evidence_based_inference": (
+            "[INFERENCE] pytest was added to requirements.txt two commits before "
+            "the test files (in c5040fb). This ordering — declaring the test "
+            "framework before writing tests — is consistent with planned test "
+            "addition but does not prove it. The test suite covers all four "
+            "components that existed at this point (Task, TaskService, AuthService, "
+            "EventBus) but does not cover the API endpoints (taskflow/api/*.py) or "
+            "the repositories (task_repository.py, user_repository.py). "
+            "test_task_service.py's pagination test asserts page1[0].title == "
+            "'Task 0', which verifies the corrected formula from a4544f2 rather "
+            "than the buggy one from 861190a — the test was written after the fix "
+            "was in place. The EventBus test (test_handler_exception_does_not_crash_bus) "
+            "directly tests the exception-swallowing behaviour introduced in "
+            "c434a6f, suggesting the test was written with knowledge of that "
+            "design decision."
+        ),
+        "unknown": (
+            "The repository contains no evidence explaining: (1) why tests were "
+            "added after 8 of the 10 commits rather than alongside the code they "
+            "test; (2) why the API endpoints and repositories are not covered by "
+            "the test suite; (3) whether the 34-test count in the commit message "
+            "was a target or a result; (4) there is no CI configuration, no "
+            "test-running script, and no record of any test run in the repository "
+            "— it is unknown whether these tests were ever executed."
+        ),
+        "evidence_files": {
+            "af36d82": [
+                "taskflow/tests/test_task_model.py",
+                "taskflow/tests/test_task_service.py",
+                "taskflow/tests/test_auth_service.py",
+                "taskflow/tests/test_event_bus.py",
+            ],
+            "c5040fb": ["requirements.txt"],
+        },
+        "evidence_reasons": {
+            "af36d82": (
+                "All four test files added here. Diffs show complete test coverage "
+                "of model, service, auth, and event bus components. Pagination test "
+                "verifies the corrected formula from a4544f2."
+            ),
+            "c5040fb": (
+                "pytest==7.4.0 added to requirements.txt in this earlier commit, "
+                "two commits before the test files. This establishes pytest was "
+                "prepared before tests were written."
+            ),
+        },
+        "confidence": "HIGH",
+        "uncertainty_notes": None,
+    },
+
+    # -----------------------------------------------------------------------
+    # WHY 8 — Security Hardening: Rate Limiting and Input Validation
+    # Commit: a2116ca
+    #
+    # Evidence consulted:
+    #   - commit message: "security: add login rate limiter (max 5 attempts
+    #     / 5 min) and input length validation on registration"
+    #   - diff of taskflow/security/rate_limiter.py (new file):
+    #     MAX_ATTEMPTS=5, LOCKOUT_SECONDS=300 constants; record_failure(),
+    #     is_locked(), clear() methods using time.monotonic().
+    #   - diff of taskflow/api/auth.py: rate_limiter.is_locked() called
+    #     before login attempt; record_failure() on PermissionError;
+    #     clear() on success; 429 HTTP status on locked account.
+    #     _MAX_USERNAME=64, _MAX_EMAIL=254, _MAX_PASSWORD=128 constants;
+    #     minimum password length check: len(data["password"]) < 8
+    #     returns 422.
+    #   - diff of README.md: two new bullet points added:
+    #     "Token-based authentication with brute-force rate limiting"
+    #     "Input validation on all endpoints"
+    #   - No prior commit modified the login endpoint's security behaviour.
+    # -----------------------------------------------------------------------
+    {
+        "analysis_id": "why_8",
+        "change": "Login rate limiting and registration input validation",
+        "commit_short_hashes": ["a2116ca"],
+        "observed_change": (
+            "taskflow/security/rate_limiter.py was added: RateLimiter class with "
+            "MAX_ATTEMPTS=5, LOCKOUT_SECONDS=300 (5 minutes); record_failure(key) "
+            "appends time.monotonic() timestamps; is_locked(key) returns True when "
+            "recent failure count >= MAX_ATTEMPTS; clear(key) removes the key on "
+            "successful login; module-level singleton rate_limiter. "
+            "taskflow/api/auth.py was modified (+26 lines, -1 line): "
+            "rate_limiter imported; login() now calls is_locked() before "
+            "authentication and returns HTTP 429 with message 'Too many failed "
+            "attempts — try again later' when locked; record_failure() called on "
+            "PermissionError; clear() called on success. register() gained length "
+            "validation: username > 64 chars returns 422, email > 254 chars "
+            "returns 422, password > 128 chars returns 422, password < 8 chars "
+            "returns 422 with message 'password must be at least 8 characters'. "
+            "README.md updated with two bullet points documenting the rate "
+            "limiting and input validation as user-facing features."
+        ),
+        "stated_intent": (
+            "The commit message states: 'security: add login rate limiter "
+            "(max 5 attempts / 5 min) and input length validation on registration'. "
+            "The 'security:' prefix classifies this explicitly as a security "
+            "change. The message names the specific policy: 5 attempts per 5 "
+            "minutes. README.md explicitly documents 'Token-based authentication "
+            "with brute-force rate limiting' and 'Input validation on all "
+            "endpoints' as features — this is a repository-observable statement "
+            "of what was intended to be user-visible."
+        ),
+        "evidence_based_inference": (
+            "[INFERENCE] The parameter values (MAX_ATTEMPTS=5, LOCKOUT_SECONDS=300) "
+            "are consistent with commonly documented brute-force mitigation "
+            "thresholds, but the repository contains no document, comment, or "
+            "reference that explains why these specific values were chosen. The "
+            "input length limits (64 / 254 / 128) correspond to conventional web "
+            "field limits — 254 characters matches the RFC 5321 maximum email "
+            "address length — suggesting awareness of standards, but no reference "
+            "to any RFC or standard appears in the code or commit. The fact that "
+            "this commit arrives as the final commit in the repository, after the "
+            "test suite, is consistent with security hardening being a late-stage "
+            "concern, but the repository does not state this ordering was "
+            "deliberate. The README update listing security features suggests this "
+            "was considered a user-visible, documentable capability rather than "
+            "an internal implementation detail."
+        ),
+        "unknown": (
+            "The repository contains no evidence explaining: (1) what triggered "
+            "the security hardening — no vulnerability report, no security review "
+            "note, and no external reference is present; (2) why the rate limiter "
+            "is in-memory rather than persistent — an in-memory rate limiter does "
+            "not survive server restarts, but no comment acknowledges this "
+            "limitation; (3) why 5 attempts / 5 minutes specifically; (4) why "
+            "input validation was not added when the register() endpoint was first "
+            "written in c5040fb; (5) whether the security changes were added in "
+            "response to a specific concern or as a proactive measure — "
+            "insufficient repository evidence to determine this."
+        ),
+        "evidence_files": {
+            "a2116ca": [
+                "taskflow/security/rate_limiter.py",
+                "taskflow/api/auth.py",
+                "README.md",
+            ]
+        },
+        "evidence_reasons": {
+            "a2116ca": (
+                "All changes in this commit. Diff of rate_limiter.py shows "
+                "MAX_ATTEMPTS=5 and LOCKOUT_SECONDS=300 constants. Diff of auth.py "
+                "shows 429 response and is_locked() integration. README diff shows "
+                "explicit security feature documentation."
+            )
+        },
+        "confidence": "HIGH",
+        "uncertainty_notes": None,
+    },
+]
+
+
+# ---------------------------------------------------------------------------
+# Loading helpers
+# ---------------------------------------------------------------------------
+
+def _load_history(path: str) -> dict[str, Any]:
+    p = Path(path)
+    if not p.exists():
+        raise ValueError(f"Input file not found: {path}")
+    with p.open(encoding="utf-8") as fh:
+        try:
+            return json.load(fh)
+        except json.JSONDecodeError as exc:
+            raise ValueError(f"Invalid JSON in {path}: {exc}") from exc
+
+
+def _build_short_to_full(history: dict) -> dict[str, str]:
+    return {c["hash"][:7]: c["hash"] for c in history["commits"]}
+
+
+def _resolve(short: str, idx: dict[str, str]) -> str:
+    full = idx.get(short)
+    if full is None:
+        raise ValueError(f"Commit short hash {short!r} not found in history")
+    return full
+
+
+# ---------------------------------------------------------------------------
+# Assembly
+# ---------------------------------------------------------------------------
+
+def _assemble(specs: list[dict], short_to_full: dict[str, str],
+              full_to_commit: dict[str, dict]) -> list[dict[str, Any]]:
+    analyses = []
+    for spec in specs:
+        # Resolve commit hashes
+        full_hashes = [_resolve(sh, short_to_full)
+                       for sh in spec["commit_short_hashes"]]
+
+        # Build evidence list
+        evidence = []
+        for sh, files in spec["evidence_files"].items():
+            fh = _resolve(sh, short_to_full)
+            evidence.append({
+                "commit_hash": fh,
+                "files":       files,
+                "reason":      spec["evidence_reasons"][sh],
+            })
+
+        analyses.append({
+            "analysis_id":              spec["analysis_id"],
+            "change":                   spec["change"],
+            "commit_hashes":            full_hashes,
+            "observed_change":          spec["observed_change"],
+            "stated_intent":            spec["stated_intent"],
+            "evidence_based_inference": spec["evidence_based_inference"],
+            "unknown":                  spec["unknown"],
+            "evidence":                 evidence,
+            "confidence":               spec["confidence"],
+            "uncertainty_notes":        spec["uncertainty_notes"],
+        })
+    return analyses
+
+
+# ---------------------------------------------------------------------------
+# Main pipeline
+# ---------------------------------------------------------------------------
+
+def analyse(input_path: str) -> dict[str, Any]:
+    print(f"[why_analyzer] Loading history from: {input_path}")
+    history = _load_history(input_path)
+
+    short_to_full = _build_short_to_full(history)
+    full_to_commit = {c["hash"]: c for c in history["commits"]}
+
+    print(f"[why_analyzer] Assembling {len(_WHY_SPECS)} change analysis/analyses...")
+    analyses = _assemble(_WHY_SPECS, short_to_full, full_to_commit)
+
+    repo = history["repository"]
+    document: dict[str, Any] = {
+        "schema_version": "1.0",
+        "generated_at":   datetime.now(timezone.utc).isoformat(),
+        "analyzer":       ANALYZER_ID,
+        "source_file":    input_path,
+        "repository_summary": {
+            "total_commits":       repo["total_commits"],
+            "total_analyses":      len(analyses),
+            "contributors":        repo["contributors"],
+            "total_files_touched": repo["total_files_touched"],
+        },
+        "analyses": analyses,
+    }
+    return document
+
+
+# ---------------------------------------------------------------------------
+# Entry point
+# ---------------------------------------------------------------------------
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Codebase Time Machine — Why Analyzer"
+    )
+    parser.add_argument("input_path", nargs="?",
+                        default=str(Path("output") / "repo_history.json"))
+    parser.add_argument("output_path", nargs="?",
+                        default=str(Path("output") / "why_analysis.json"))
+    args = parser.parse_args()
+
+    try:
+        result = analyse(args.input_path)
+    except (ValueError, RuntimeError) as exc:
+        print(f"[ERROR] {exc}", file=sys.stderr)
+        sys.exit(1)
+
+    out_path = Path(args.output_path)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    with out_path.open("w", encoding="utf-8") as fh:
+        json.dump(result, fh, indent=2, ensure_ascii=False)
+
+    count = result["repository_summary"]["total_analyses"]
+    print(f"\n[why_analyzer] Done. {count} analysis/analyses written to: {out_path}")
+
+
+if __name__ == "__main__":
+    main()

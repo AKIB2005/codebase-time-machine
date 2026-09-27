@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Codebase Time Machine — TaskFlow Analysis</title>
+  <style>
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+  background: #f3f4f6;
+  color: #1f2328;
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 20px;
+}
+details summary::-webkit-details-marker { display: none; }
+details summary::before { content: "▶ "; font-size: 10px; }
+details[open] summary::before { content: "▼ "; }
+code { font-family: "SFMono-Regular", Consolas, monospace; }
+a { color: #3b82d4; }
+</style>
+</head>
+<body>
+  <div class="container">
+    
+<div style="background:linear-gradient(135deg,#1e3a5f 0%,#1d4ed8 100%);
+            color:#fff;padding:48px 40px;border-radius:12px;margin-bottom:32px;">
+  <div style="font-size:12px;letter-spacing:2px;text-transform:uppercase;
+              opacity:0.7;margin-bottom:8px;">IBM Bob 2.0 Hackathon</div>
+  <h1 style="margin:0 0 8px;font-size:36px;font-weight:700;letter-spacing:-0.5px;">
+    &#128336; Codebase Time Machine
+  </h1>
+  <p style="margin:0 0 4px;font-size:16px;opacity:0.85;">
+    Evidence-grounded historical analysis of the <strong>TaskFlow</strong> repository.
+  </p>
+  <p style="margin:0;font-size:12px;opacity:0.6;">
+    Generated 2026-09-27 03:26 UTC &nbsp;|&nbsp;
+    All claims traceable to commit hashes &nbsp;|&nbsp;
+    Confidence-rated analysis
+  </p>
+</div>
+
+<div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;
+            padding:24px 28px;margin-bottom:32px;">
+  <h2 style="margin:0 0 10px;color:#0369a1;font-size:18px;">&#128269; What is Codebase Time Machine?</h2>
+  <p style="margin:0 0 10px;color:#1e3a5f;line-height:1.7;">
+    <strong>Codebase Time Machine</strong> reads a Git repository and produces
+    evidence-grounded historical analysis — answering <em>what changed</em>,
+    <em>when it changed</em>, and <em>what the repository evidence suggests about why</em>.
+  </p>
+  <p style="margin:0;color:#1e3a5f;line-height:1.7;">
+    Every claim in this report is traceable to a commit hash.
+    Interpretations are explicitly labelled <strong>[INFERENCE]</strong>
+    and rated <strong>HIGH / MEDIUM / LOW</strong> confidence.
+    The tool never invents developer motivation.
+  </p>
+</div>
+
+
+<div style="border-left:4px solid #3b82d4;padding:4px 0 4px 16px;margin-bottom:24px;">
+  <h2 style="margin:0;font-size:22px;color:#1f2328;">&#128202; Repository Snapshot</h2>
+  <p style="color:#6b7280;margin:4px 0 0;font-size:14px;">TaskFlow · Python / Flask / SQLite</p>
+</div>
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:32px;">
+  
+<div style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;
+            padding:20px;text-align:center;flex:1;min-width:130px;">
+  <div style="font-size:32px;font-weight:700;color:#3b82d4;">10</div>
+  <div style="font-size:12px;color:#6b7280;text-transform:uppercase;
+              letter-spacing:1px;margin-top:4px;">Commits</div>
+</div>
+  
+<div style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;
+            padding:20px;text-align:center;flex:1;min-width:130px;">
+  <div style="font-size:32px;font-weight:700;color:#3b82d4;">29</div>
+  <div style="font-size:12px;color:#6b7280;text-transform:uppercase;
+              letter-spacing:1px;margin-top:4px;">Files Touched</div>
+</div>
+  
+<div style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;
+            padding:20px;text-align:center;flex:1;min-width:130px;">
+  <div style="font-size:32px;font-weight:700;color:#3b82d4;">1</div>
+  <div style="font-size:12px;color:#6b7280;text-transform:uppercase;
+              letter-spacing:1px;margin-top:4px;">Contributor</div>
+</div>
+  
+<div style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;
+            padding:20px;text-align:center;flex:1;min-width:130px;">
+  <div style="font-size:32px;font-weight:700;color:#3b82d4;">5</div>
+  <div style="font-size:12px;color:#6b7280;text-transform:uppercase;
+              letter-spacing:1px;margin-top:4px;">Epochs</div>
+</div>
+  
+<div style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;
+            padding:20px;text-align:center;flex:1;min-width:130px;">
+  <div style="font-size:32px;font-weight:700;color:#3b82d4;">8</div>
+  <div style="font-size:12px;color:#6b7280;text-transform:uppercase;
+              letter-spacing:1px;margin-top:4px;">Change Analyses</div>
+</div>
+</div>
+<div style="background:#f7f8fa;border:1px solid #e5e7eb;border-radius:8px;
+            padding:16px 20px;margin-bottom:32px;font-size:13px;color:#374151;">
+  <strong>Date range:</strong> 2026-09-27 00:25 UTC &rarr; 2026-09-27 00:31 UTC
+  &nbsp;|&nbsp; <strong>Technology:</strong> Python &middot; Flask 2.3.2 &middot; SQLite &middot; pytest 7.4.0
+  &nbsp;|&nbsp; <strong>Entry point:</strong> main.py &rarr; create_app() &rarr; app.run(0.0.0.0:5000)
+</div>
+
+
+<div style="border-left:4px solid #3b82d4;padding:4px 0 4px 16px;margin-bottom:24px;">
+  <h2 style="margin:0;font-size:22px;color:#1f2328;">&#9201; Historical Timeline</h2>
+  <p style="color:#6b7280;margin:4px 0 0;font-size:14px;">All 10 commits — oldest first</p>
+</div>
+<div style="margin-bottom:32px;padding-left:8px;">
+  
+<div style="display:flex;gap:0;margin-bottom:0;align-items:stretch;">
+  <div style="width:36px;display:flex;flex-direction:column;align-items:center;">
+    <div style="width:12px;height:12px;border-radius:50%;background:#6b7280;
+                margin-top:16px;flex-shrink:0;border:2px solid #fff;
+                box-shadow:0 0 0 2px #6b7280;"></div>
+    <div style="width:2px;background:#e5e7eb;flex:1;margin:2px 0;"></div>
+  </div>
+  <div style="flex:1;background:#fff;border:1px solid #e5e7eb;border-radius:8px;
+              padding:12px 16px;margin:4px 0 4px 8px;">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <span style="font-size:11px;font-weight:600;color:#fff;background:#6b7280;
+                   padding:2px 8px;border-radius:10px;">chore</span>
+      <code style="font-size:11px;color:#6b7280;background:#f3f4f6;
+                   padding:1px 6px;border-radius:4px;">79b1b0ce</code>
+      <span style="font-size:12px;color:#6b7280;">2026-09-27 00:25 UTC</span>
+    </div>
+    <div style="margin:6px 0 4px;font-size:14px;color:#1f2328;font-weight:500;">
+      initial project scaffold for TaskFlow
+    </div>
+    <div style="font-size:11px;color:#6b7280;">
+      10 file(s) changed &nbsp;
+      <span style="color:#10b981;">+51</span> /
+      <span style="color:#ef4444;">-0</span>
+    </div>
+  </div>
+</div>
+<div style="display:flex;gap:0;margin-bottom:0;align-items:stretch;">
+  <div style="width:36px;display:flex;flex-direction:column;align-items:center;">
+    <div style="width:12px;height:12px;border-radius:50%;background:#3b82f6;
+                margin-top:16px;flex-shrink:0;border:2px solid #fff;
+                box-shadow:0 0 0 2px #3b82f6;"></div>
+    <div style="width:2px;background:#e5e7eb;flex:1;margin:2px 0;"></div>
+  </div>
+  <div style="flex:1;background:#fff;border:1px solid #e5e7eb;border-radius:8px;
+              padding:12px 16px;margin:4px 0 4px 8px;">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <span style="font-size:11px;font-weight:600;color:#fff;background:#3b82f6;
+                   padding:2px 8px;border-radius:10px;">feat</span>
+      <code style="font-size:11px;color:#6b7280;background:#f3f4f6;
+                   padding:1px 6px;border-radius:4px;">1d9e8be0</code>
+      <span style="font-size:12px;color:#6b7280;">2026-09-27 00:26 UTC</span>
+    </div>
+    <div style="margin:6px 0 4px;font-size:14px;color:#1f2328;font-weight:500;">
+      add Task model and TaskService with in-memory CRUD
+    </div>
+    <div style="font-size:11px;color:#6b7280;">
+      3 file(s) changed &nbsp;
+      <span style="color:#10b981;">+110</span> /
+      <span style="color:#ef4444;">-0</span>
+    </div>
+  </div>
+</div>
+<div style="display:flex;gap:0;margin-bottom:0;align-items:stretch;">
+  <div style="width:36px;display:flex;flex-direction:column;align-items:center;">
+    <div style="width:12px;height:12px;border-radius:50%;background:#3b82f6;
+                margin-top:16px;flex-shrink:0;border:2px solid #fff;
+                box-shadow:0 0 0 2px #3b82f6;"></div>
+    <div style="width:2px;background:#e5e7eb;flex:1;margin:2px 0;"></div>
+  </div>
+  <div style="flex:1;background:#fff;border:1px solid #e5e7eb;border-radius:8px;
+              padding:12px 16px;margin:4px 0 4px 8px;">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <span style="font-size:11px;font-weight:600;color:#fff;background:#3b82f6;
+                   padding:2px 8px;border-radius:10px;">feat</span>
+      <code style="font-size:11px;color:#6b7280;background:#f3f4f6;
+                   padding:1px 6px;border-radius:4px;">967b11aa</code>
+      <span style="font-size:12px;color:#6b7280;">2026-09-27 00:27 UTC</span>
+    </div>
+    <div style="margin:6px 0 4px;font-size:14px;color:#1f2328;font-weight:500;">
+      introduce authentication — User model, AuthService with hashed passwords and session tokens
+    </div>
+    <div style="font-size:11px;color:#6b7280;">
+      3 file(s) changed &nbsp;
+      <span style="color:#10b981;">+113</span> /
+      <span style="color:#ef4444;">-1</span>
+    </div>
+  </div>
+</div>
+<div style="display:flex;gap:0;margin-bottom:0;align-items:stretch;">
+  <div style="width:36px;display:flex;flex-direction:column;align-items:center;">
+    <div style="width:12px;height:12px;border-radius:50%;background:#3b82f6;
+                margin-top:16px;flex-shrink:0;border:2px solid #fff;
+                box-shadow:0 0 0 2px #3b82f6;"></div>
+    <div style="width:2px;background:#e5e7eb;flex:1;margin:2px 0;"></div>
+  </div>
+  <div style="flex:1;background:#fff;border:1px solid #e5e7eb;border-radius:8px;
+              padding:12px 16px;margin:4px 0 4px 8px;">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <span style="font-size:11px;font-weight:600;color:#fff;background:#3b82f6;
+                   padding:2px 8px;border-radius:10px;">feat</span>
+      <code style="font-size:11px;color:#6b7280;background:#f3f4f6;
+                   padding:1px 6px;border-radius:4px;">c8491ae3</code>
+      <span style="font-size:12px;color:#6b7280;">2026-09-27 00:28 UTC</span>
+    </div>
+    <div style="margin:6px 0 4px;font-size:14px;color:#1f2328;font-weight:500;">
+      add SQLite persistence layer — db module, TaskRepository, UserRepository
+    </div>
+    <div style="font-size:11px;color:#6b7280;">
+      4 file(s) changed &nbsp;
+      <span style="color:#10b981;">+185</span> /
+      <span style="color:#ef4444;">-1</span>
+    </div>
+  </div>
+</div>
+<div style="display:flex;gap:0;margin-bottom:0;align-items:stretch;">
+  <div style="width:36px;display:flex;flex-direction:column;align-items:center;">
+    <div style="width:12px;height:12px;border-radius:50%;background:#3b82f6;
+                margin-top:16px;flex-shrink:0;border:2px solid #fff;
+                box-shadow:0 0 0 2px #3b82f6;"></div>
+    <div style="width:2px;background:#e5e7eb;flex:1;margin:2px 0;"></div>
+  </div>
+  <div style="flex:1;background:#fff;border:1px solid #e5e7eb;border-radius:8px;
+              padding:12px 16px;margin:4px 0 4px 8px;">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <span style="font-size:11px;font-weight:600;color:#fff;background:#3b82f6;
+                   padding:2px 8px;border-radius:10px;">feat</span>
+      <code style="font-size:11px;color:#6b7280;background:#f3f4f6;
+                   padding:1px 6px;border-radius:4px;">c5040fb5</code>
+      <span style="font-size:12px;color:#6b7280;">2026-09-27 00:29 UTC</span>
+    </div>
+    <div style="margin:6px 0 4px;font-size:14px;color:#1f2328;font-weight:500;">
+      add Flask REST API layer — tasks and auth blueprints, app factory, auth middleware
+    </div>
+    <div style="font-size:11px;color:#6b7280;">
+      6 file(s) changed &nbsp;
+      <span style="color:#10b981;">+151</span> /
+      <span style="color:#ef4444;">-15</span>
+    </div>
+  </div>
+</div>
+<div style="display:flex;gap:0;margin-bottom:0;align-items:stretch;">
+  <div style="width:36px;display:flex;flex-direction:column;align-items:center;">
+    <div style="width:12px;height:12px;border-radius:50%;background:#3b82f6;
+                margin-top:16px;flex-shrink:0;border:2px solid #fff;
+                box-shadow:0 0 0 2px #3b82f6;"></div>
+    <div style="width:2px;background:#e5e7eb;flex:1;margin:2px 0;"></div>
+  </div>
+  <div style="flex:1;background:#fff;border:1px solid #e5e7eb;border-radius:8px;
+              padding:12px 16px;margin:4px 0 4px 8px;">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <span style="font-size:11px;font-weight:600;color:#fff;background:#3b82f6;
+                   padding:2px 8px;border-radius:10px;">feat</span>
+      <code style="font-size:11px;color:#6b7280;background:#f3f4f6;
+                   padding:1px 6px;border-radius:4px;">861190af</code>
+      <span style="font-size:12px;color:#6b7280;">2026-09-27 00:29 UTC</span>
+    </div>
+    <div style="margin:6px 0 4px;font-size:14px;color:#1f2328;font-weight:500;">
+      add pagination to list_tasks (page/page_size support)
+    </div>
+    <div style="font-size:11px;color:#6b7280;">
+      1 file(s) changed &nbsp;
+      <span style="color:#10b981;">+7</span> /
+      <span style="color:#ef4444;">-2</span>
+    </div>
+  </div>
+</div>
+<div style="display:flex;gap:0;margin-bottom:0;align-items:stretch;">
+  <div style="width:36px;display:flex;flex-direction:column;align-items:center;">
+    <div style="width:12px;height:12px;border-radius:50%;background:#ef4444;
+                margin-top:16px;flex-shrink:0;border:2px solid #fff;
+                box-shadow:0 0 0 2px #ef4444;"></div>
+    <div style="width:2px;background:#e5e7eb;flex:1;margin:2px 0;"></div>
+  </div>
+  <div style="flex:1;background:#fff;border:1px solid #e5e7eb;border-radius:8px;
+              padding:12px 16px;margin:4px 0 4px 8px;">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <span style="font-size:11px;font-weight:600;color:#fff;background:#ef4444;
+                   padding:2px 8px;border-radius:10px;">fix</span>
+      <code style="font-size:11px;color:#6b7280;background:#f3f4f6;
+                   padding:1px 6px;border-radius:4px;">a4544f2b</code>
+      <span style="font-size:12px;color:#6b7280;">2026-09-27 00:29 UTC</span>
+    </div>
+    <div style="margin:6px 0 4px;font-size:14px;color:#1f2328;font-weight:500;">
+      correct off-by-one in list_tasks pagination (start index was skipping first item per page)
+    </div>
+    <div style="font-size:11px;color:#6b7280;">
+      1 file(s) changed &nbsp;
+      <span style="color:#10b981;">+1</span> /
+      <span style="color:#ef4444;">-3</span>
+    </div>
+  </div>
+</div>
+<div style="display:flex;gap:0;margin-bottom:0;align-items:stretch;">
+  <div style="width:36px;display:flex;flex-direction:column;align-items:center;">
+    <div style="width:12px;height:12px;border-radius:50%;background:#8b5cf6;
+                margin-top:16px;flex-shrink:0;border:2px solid #fff;
+                box-shadow:0 0 0 2px #8b5cf6;"></div>
+    <div style="width:2px;background:#e5e7eb;flex:1;margin:2px 0;"></div>
+  </div>
+  <div style="flex:1;background:#fff;border:1px solid #e5e7eb;border-radius:8px;
+              padding:12px 16px;margin:4px 0 4px 8px;">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <span style="font-size:11px;font-weight:600;color:#fff;background:#8b5cf6;
+                   padding:2px 8px;border-radius:10px;">refactor</span>
+      <code style="font-size:11px;color:#6b7280;background:#f3f4f6;
+                   padding:1px 6px;border-radius:4px;">c434a6f6</code>
+      <span style="font-size:12px;color:#6b7280;">2026-09-27 00:30 UTC</span>
+    </div>
+    <div style="margin:6px 0 4px;font-size:14px;color:#1f2328;font-weight:500;">
+      introduce EventBus and NotificationService — decouple task side-effects from TaskService
+    </div>
+    <div style="font-size:11px;color:#6b7280;">
+      4 file(s) changed &nbsp;
+      <span style="color:#10b981;">+88</span> /
+      <span style="color:#ef4444;">-2</span>
+    </div>
+  </div>
+</div>
+<div style="display:flex;gap:0;margin-bottom:0;align-items:stretch;">
+  <div style="width:36px;display:flex;flex-direction:column;align-items:center;">
+    <div style="width:12px;height:12px;border-radius:50%;background:#10b981;
+                margin-top:16px;flex-shrink:0;border:2px solid #fff;
+                box-shadow:0 0 0 2px #10b981;"></div>
+    <div style="width:2px;background:#e5e7eb;flex:1;margin:2px 0;"></div>
+  </div>
+  <div style="flex:1;background:#fff;border:1px solid #e5e7eb;border-radius:8px;
+              padding:12px 16px;margin:4px 0 4px 8px;">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <span style="font-size:11px;font-weight:600;color:#fff;background:#10b981;
+                   padding:2px 8px;border-radius:10px;">test</span>
+      <code style="font-size:11px;color:#6b7280;background:#f3f4f6;
+                   padding:1px 6px;border-radius:4px;">af36d821</code>
+      <span style="font-size:12px;color:#6b7280;">2026-09-27 00:31 UTC</span>
+    </div>
+    <div style="margin:6px 0 4px;font-size:14px;color:#1f2328;font-weight:500;">
+      add pytest suite — Task model, TaskService, AuthService, EventBus (34 test cases)
+    </div>
+    <div style="font-size:11px;color:#6b7280;">
+      4 file(s) changed &nbsp;
+      <span style="color:#10b981;">+194</span> /
+      <span style="color:#ef4444;">-0</span>
+    </div>
+  </div>
+</div>
+<div style="display:flex;gap:0;margin-bottom:0;align-items:stretch;">
+  <div style="width:36px;display:flex;flex-direction:column;align-items:center;">
+    <div style="width:12px;height:12px;border-radius:50%;background:#f59e0b;
+                margin-top:16px;flex-shrink:0;border:2px solid #fff;
+                box-shadow:0 0 0 2px #f59e0b;"></div>
+    
+  </div>
+  <div style="flex:1;background:#fff;border:1px solid #e5e7eb;border-radius:8px;
+              padding:12px 16px;margin:4px 0 4px 8px;">
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+      <span style="font-size:11px;font-weight:600;color:#fff;background:#f59e0b;
+                   padding:2px 8px;border-radius:10px;">security</span>
+      <code style="font-size:11px;color:#6b7280;background:#f3f4f6;
+                   padding:1px 6px;border-radius:4px;">a2116ca9</code>
+      <span style="font-size:12px;color:#6b7280;">2026-09-27 00:31 UTC</span>
+    </div>
+    <div style="margin:6px 0 4px;font-size:14px;color:#1f2328;font-weight:500;">
+      add login rate limiter (max 5 attempts / 5 min) and input length validation on registration
+    </div>
+    <div style="font-size:11px;color:#6b7280;">
+      4 file(s) changed &nbsp;
+      <span style="color:#10b981;">+65</span> /
+      <span style="color:#ef4444;">-1</span>
+    </div>
+  </div>
+</div>
+</div>
+
+<div style="border-left:4px solid #3b82d4;padding:4px 0 4px 16px;margin-bottom:24px;">
+  <h2 style="margin:0;font-size:22px;color:#1f2328;">&#127942; Five Historical Epochs</h2>
+  <p style="color:#6b7280;margin:4px 0 0;font-size:14px;">Commit groups identified by cohesive evidence</p>
+</div>
+<div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;
+            margin-bottom:20px;overflow:hidden;">
+  <div style="background:#3b82f6;padding:14px 20px;display:flex;
+              align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+    <div>
+      <span style="color:rgba(255,255,255,0.7);font-size:11px;
+                   text-transform:uppercase;letter-spacing:1px;">
+        Epoch 1
+      </span>
+      <h3 style="margin:2px 0 0;color:#fff;font-size:17px;">Foundation and Domain Bootstrap</h3>
+    </div>
+    <div style="display:flex;gap:12px;align-items:center;">
+      <span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">HIGH</span>
+      <span style="color:rgba(255,255,255,0.8);font-size:12px;">
+        2 commit(s) &nbsp;
+        +161 / -0 lines
+      </span>
+    </div>
+  </div>
+  <div style="padding:16px 20px;">
+    <p style="margin:0 0 10px;color:#374151;font-size:14px;line-height:1.6;">
+      The project skeleton was created and the core Task domain model with in-memory CRUD operations was established, forming the entire basis for subsequent development.
+    </p>
+    <div style="margin-bottom:10px;">
+      <span style="font-size:11px;font-weight:600;color:#6b7280;
+                   text-transform:uppercase;letter-spacing:1px;">Commits: </span>
+      <code style="font-size:11px;background:#f3f4f6;padding:1px 6px;border-radius:4px;color:#374151;">79b1b0ce</code> <code style="font-size:11px;background:#f3f4f6;padding:1px 6px;border-radius:4px;color:#374151;">1d9e8be0</code>
+    </div>
+    <div style="margin-bottom:12px;">
+      <span style="font-size:11px;font-weight:600;color:#6b7280;
+                   text-transform:uppercase;letter-spacing:1px;">Key files</span><br>
+      <div style="margin-top:4px;"><span style="background:#e5e7eb;color:#374151;padding:1px 7px;border-radius:8px;font-size:11px;margin:1px 2px;display:inline-block;">.gitignore</span> <span style="background:#e5e7eb;color:#374151;padding:1px 7px;border-radius:8px;font-size:11px;margin:1px 2px;display:inline-block;">README.md</span> <span style="background:#e5e7eb;color:#374151;padding:1px 7px;border-radius:8px;font-size:11px;margin:1px 2px;display:inline-block;">config.py</span> <span style="background:#e5e7eb;color:#374151;padding:1px 7px;border-radius:8px;font-size:11px;margin:1px 2px;display:inline-block;">main.py</span> <span style="background:#e5e7eb;color:#374151;padding:1px 7px;border-radius:8px;font-size:11px;margin:1px 2px;display:inline-block;">requirements.txt</span> <span style="background:#e5e7eb;color:#374151;padding:1px 7px;border-radius:8px;font-size:11px;margin:1px 2px;display:inline-block;">taskflow/models/task.py</span> <span style="background:#e5e7eb;color:#374151;padding:1px 7px;border-radius:8px;font-size:11px;margin:1px 2px;display:inline-block;">taskflow/services/task_service.py</span></div>
+    </div>
+    <details>
+      <summary style="cursor:pointer;font-size:13px;font-weight:600;
+                      color:#3b82f6;margin-bottom:8px;">
+        Observed changes (4 entries)
+      </summary>
+      
+<div style="border-left:3px solid #3b82f6;padding:6px 12px;margin:6px 0;
+            background:#fafafa;border-radius:0 4px 4px 0;">
+  <span style="font-size:11px;color:#6b7280;font-weight:600;">
+    [file_addition] evidence: 79b1b0ce
+  </span>
+  <p style="margin:4px 0 0;font-size:13px;color:#374151;line-height:1.5;">
+    Project scaffold committed: README.md, config.py (VERSION=0.1.0), main.py (bare entry point), requirements.txt (flask==2.3.2, Werkzeug==2.3.6), .gitignore, and empty __init__.py files for taskflow/, api/, models/, services/, tests/ packages.
+  </p>
+</div>
+<div style="border-left:3px solid #3b82f6;padding:6px 12px;margin:6px 0;
+            background:#fafafa;border-radius:0 4px 4px 0;">
+  <span style="font-size:11px;color:#6b7280;font-weight:600;">
+    [diff] evidence: 1d9e8be0
+  </span>
+  <p style="margin:4px 0 0;font-size:13px;color:#374151;line-height:1.5;">
+    Task domain model added (taskflow/models/task.py): Task class with task_id, title, description, assignee, priority, status, created_at, updated_at fields; VALID_STATUSES = (&#x27;todo&#x27;, &#x27;in_progress&#x27;, &#x27;done&#x27;); VALID_PRIORITIES = (&#x27;low&#x27;, &#x27;medium&#x27;, &#x27;high&#x27;); update() method with field validation; to_dict() method.
+  </p>
+</div>
+<div style="border-left:3px solid #3b82f6;padding:6px 12px;margin:6px 0;
+            background:#fafafa;border-radius:0 4px 4px 0;">
+  <span style="font-size:11px;color:#6b7280;font-weight:600;">
+    [file_addition] evidence: 1d9e8be0
+  </span>
+  <p style="margin:4px 0 0;font-size:13px;color:#374151;line-height:1.5;">
+    TaskService added (taskflow/services/task_service.py): in-memory dict-backed CRUD — create_task, get_task, list_tasks (with optional status filter), update_task, delete_task, __len__.
+  </p>
+</div>
+<div style="border-left:3px solid #3b82f6;padding:6px 12px;margin:6px 0;
+            background:#fafafa;border-radius:0 4px 4px 0;">
+  <span style="font-size:11px;color:#6b7280;font-weight:600;">
+    [diff] evidence: 1d9e8be0
+  </span>
+  <p style="margin:4px 0 0;font-size:13px;color:#374151;line-height:1.5;">
+    main.py updated to import TaskService and demonstrate task creation, update, and listing via console output (script-mode execution).
+  </p>
+</div>
+    </details>
+    <div style="background:#f0f4ff;border:1px solid #c7d7fd;border-radius:6px;
+                padding:10px 14px;margin-top:10px;">
+      <span style="font-size:11px;font-weight:600;color:#4338ca;">
+        [INFERENCE] Domain-first incremental build
+      </span>
+      <p style="margin:4px 0 0;font-size:13px;color:#374151;line-height:1.5;">
+        The repository was built domain-first: the skeleton and core business object were established before any persistence or network layer was introduced. This is inference based on commit ordering and the absence of any storage or HTTP code in these commits.
+      </p>
+      <p style="margin:6px 0 0;font-size:12px;color:#6b7280;">
+        <em>Basis: Commit 79b1b0c adds only scaffolding with no logic. Commit 1d9e8be adds only domain model and service with in-memory storage — no db.py, no Flask imports, no routes.</em>
+      </p>
+    </div>
+  </div>
+</div>
+<div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;
+            margin-bottom:20px;overflow:hidden;">
+  <div style="background:#8b5cf6;padding:14px 20px;display:flex;
+              align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+    <div>
+      <span style="color:rgba(255,255,255,0.7);font-size:11px;
+                   text-transform:uppercase;letter-spacing:1px;">
+        Epoch 2
+      </span>
+      <h3 style="margin:2px 0 0;color:#fff;font-size:17px;">Vertical Feature Build-Out: Auth, Persistence, and HTTP API</h3>
+    </div>
+    <div style="display:flex;gap:12px;align-items:center;">
+      <span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">HIGH</span>
+      <span style="color:rgba(255,255,255,0.8);font-size:12px;">
+        3 commit(s) &nbsp;
+        +449 / -17 lines
+      </span>
+    </div>
+  </div>
+  <div style="padding:16px 20px;">
+    <p style="margin:0 0 10px;color:#374151;font-size:14px;line-height:1.6;">
+      Three consecutive feature commits transformed the bare domain model into a deployable service by adding user authentication with hashed passwords, SQLite-backed persistence, and a full Flask REST API with token-based auth middleware.
+    </p>
+    <div style="margin-bottom:10px;">
+      <span style="font-size:11px;font-weight:600;color:#6b7280;
+                   text-transform:uppercase;letter-spacing:1px;">Commits: </span>
+      <code style="font-size:11px;background:#f3f4f6;padding:1px 6px;border-radius:4px;color:#374151;">967b11aa</code> <code style="font-size:11px;background:#f3f4f6;padding:1px 6px;border-radius:4px;color:#374151;">c8491ae3</code> <code style="font-size:11px;background:#f3f4f6;padding:1px 6px;border-radius:4px;color:#374151;">c5040fb5</code>
+    </div>
+    <div style="margin-bottom:12px;">
+      <span style="font-size:11px;font-weight:600;color:#6b7280;
+                   text-transform:uppercase;letter-spacing:1px;">Key files</span><br>
+      <div style="margin-top:4px;"><span style="background:#e5e7eb;color:#374151;padding:1px 7px;border-radius:8px;font-size:11px;margin:1px 2px;display:inline-block;">config.py</span> <span style="background:#e5e7eb;color:#374151;padding:1px 7px;border-radius:8px;font-size:11px;margin:1px 2px;display:inline-block;">main.py</span> <span style="background:#e5e7eb;color:#374151;padding:1px 7px;border-radius:8px;font-size:11px;margin:1px 2px;display:inline-block;">requirements.txt</span> <span style="background:#e5e7eb;color:#374151;padding:1px 7px;border-radius:8px;font-size:11px;margin:1px 2px;display:inline-block;">taskflow/api/auth.py</span> <span style="background:#e5e7eb;color:#374151;padding:1px 7px;border-radius:8px;font-size:11px;margin:1px 2px;display:inline-block;">taskflow/api/auth_middleware.py</span> <span style="background:#e5e7eb;color:#374151;padding:1px 7px;border-radius:8px;font-size:11px;margin:1px 2px;display:inline-block;">taskflow/api/tasks.py</span> <span style="background:#e5e7eb;color:#374151;padding:1px 7px;border-radius:8px;font-size:11px;margin:1px 2px;display:inline-block;">taskflow/app.py</span> <span style="background:#e5e7eb;color:#374151;padding:1px 7px;border-radius:8px;font-size:11px;margin:1px 2px;display:inline-block;">taskflow/db.py</span> <span style="background:#e5e7eb;color:#374151;padding:1px 7px;border-radius:8px;font-size:11px;margin:1px 2px;display:inline-block;">taskflow/models/task_repository.py</span> <span style="background:#e5e7eb;color:#374151;padding:1px 7px;border-radius:8px;font-size:11px;margin:1px 2px;display:inline-block;">taskflow/models/user.py</span><span style="background:#f3f4f6;color:#374151;padding:1px 7px;border-radius:8px;font-size:11px;margin:1px 2px;display:inline-block;">+2 more</span></div>
+    </div>
+    <details>
+      <summary style="cursor:pointer;font-size:13px;font-weight:600;
+                      color:#8b5cf6;margin-bottom:8px;">
+        Observed changes (6 entries)
+      </summary>
+      
+<div style="border-left:3px solid #8b5cf6;padding:6px 12px;margin:6px 0;
+            background:#fafafa;border-radius:0 4px 4px 0;">
+  <span style="font-size:11px;color:#6b7280;font-weight:600;">
+    [file_addition] evidence: 967b11aa
+  </span>
+  <p style="margin:4px 0 0;font-size:13px;color:#374151;line-height:1.5;">
+    User model added (taskflow/models/user.py): User class with user_id, username, email, password_hash, role (&#x27;admin&#x27;|&#x27;member&#x27;), is_active fields. config.py updated to VERSION=0.2.0 and SESSION_TOKEN_LENGTH=32 constant added.
+  </p>
+</div>
+<div style="border-left:3px solid #8b5cf6;padding:6px 12px;margin:6px 0;
+            background:#fafafa;border-radius:0 4px 4px 0;">
+  <span style="font-size:11px;color:#6b7280;font-weight:600;">
+    [diff] evidence: 967b11aa
+  </span>
+  <p style="margin:4px 0 0;font-size:13px;color:#374151;line-height:1.5;">
+    AuthService added (taskflow/services/auth_service.py): SHA-256 password hashing with a random 16-byte hex salt (using secrets.token_hex), login returning a secrets.token_urlsafe(32) session token, logout, get_user_by_token, require_admin.
+  </p>
+</div>
+<div style="border-left:3px solid #8b5cf6;padding:6px 12px;margin:6px 0;
+            background:#fafafa;border-radius:0 4px 4px 0;">
+  <span style="font-size:11px;color:#6b7280;font-weight:600;">
+    [file_addition] evidence: c8491ae3
+  </span>
+  <p style="margin:4px 0 0;font-size:13px;color:#374151;line-height:1.5;">
+    SQLite persistence layer added: taskflow/db.py (connection context manager with PRAGMA foreign_keys=ON, rollback on exception, initialize_db() creating &#x27;users&#x27; and &#x27;tasks&#x27; tables with CREATE TABLE IF NOT EXISTS DDL). DATABASE_PATH config key added; config.py updated to VERSION=0.3.0.
+  </p>
+</div>
+<div style="border-left:3px solid #8b5cf6;padding:6px 12px;margin:6px 0;
+            background:#fafafa;border-radius:0 4px 4px 0;">
+  <span style="font-size:11px;color:#6b7280;font-weight:600;">
+    [file_addition] evidence: c8491ae3
+  </span>
+  <p style="margin:4px 0 0;font-size:13px;color:#374151;line-height:1.5;">
+    TaskRepository (taskflow/models/task_repository.py) and UserRepository (taskflow/models/user_repository.py) added: both use get_connection() context manager and implement INSERT...ON CONFLICT DO UPDATE (upsert) patterns.
+  </p>
+</div>
+<div style="border-left:3px solid #8b5cf6;padding:6px 12px;margin:6px 0;
+            background:#fafafa;border-radius:0 4px 4px 0;">
+  <span style="font-size:11px;color:#6b7280;font-weight:600;">
+    [file_addition] evidence: c5040fb5
+  </span>
+  <p style="margin:4px 0 0;font-size:13px;color:#374151;line-height:1.5;">
+    Flask REST API introduced: taskflow/api/tasks.py (Blueprint at /api/tasks — GET, POST, GET/:id, PATCH/:id, DELETE/:id), taskflow/api/auth.py (Blueprint at /api/auth — /register, /login, /logout), taskflow/api/auth_middleware.py (require_token decorator checking X-Auth-Token header). Application factory taskflow/app.py created. pytest added to requirements.txt.
+  </p>
+</div>
+<div style="border-left:3px solid #8b5cf6;padding:6px 12px;margin:6px 0;
+            background:#fafafa;border-radius:0 4px 4px 0;">
+  <span style="font-size:11px;color:#6b7280;font-weight:600;">
+    [diff] evidence: c5040fb5
+  </span>
+  <p style="margin:4px 0 0;font-size:13px;color:#374151;line-height:1.5;">
+    main.py replaced: removed script-mode task creation demo; now delegates to create_app() and calls app.run(host=&#x27;0.0.0.0&#x27;, port=5000). All 15 lines of demo code removed.
+  </p>
+</div>
+    </details>
+    <div style="background:#f0f4ff;border:1px solid #c7d7fd;border-radius:6px;
+                padding:10px 14px;margin-top:10px;">
+      <span style="font-size:11px;font-weight:600;color:#4338ca;">
+        [INFERENCE] Layered service assembly
+      </span>
+      <p style="margin:4px 0 0;font-size:13px;color:#374151;line-height:1.5;">
+        Each commit in this epoch added one complete vertical layer (identity, persistence, HTTP) in isolation before the next. This is inference about development strategy; the evidence shows sequence but does not confirm the ordering was intentional.
+      </p>
+      <p style="margin:6px 0 0;font-size:12px;color:#6b7280;">
+        <em>Basis: 967b11a introduces no db or HTTP code; c8491ae introduces db but no HTTP routes; c5040fb introduces routes but adds no new domain model files. The strict layering visible in the diffs supports this in...</em>
+      </p>
+    </div>
+  </div>
+</div>
+<div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;
+            margin-bottom:20px;overflow:hidden;">
+  <div style="background:#ef4444;padding:14px 20px;display:flex;
+              align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+    <div>
+      <span style="color:rgba(255,255,255,0.7);font-size:11px;
+                   text-transform:uppercase;letter-spacing:1px;">
+        Epoch 3
+      </span>
+      <h3 style="margin:2px 0 0;color:#fff;font-size:17px;">Pagination Bug Introduction and Correction</h3>
+    </div>
+    <div style="display:flex;gap:12px;align-items:center;">
+      <span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">HIGH</span>
+      <span style="color:rgba(255,255,255,0.8);font-size:12px;">
+        2 commit(s) &nbsp;
+        +8 / -5 lines
+      </span>
+    </div>
+  </div>
+  <div style="padding:16px 20px;">
+    <p style="margin:0 0 10px;color:#374151;font-size:14px;line-height:1.6;">
+      A pagination feature was added to list_tasks with a defective off-by-one start-index expression. The immediately following commit corrected the expression. Both commits affected only taskflow/services/task_service.py.
+    </p>
+    <div style="margin-bottom:10px;">
+      <span style="font-size:11px;font-weight:600;color:#6b7280;
+                   text-transform:uppercase;letter-spacing:1px;">Commits: </span>
+      <code style="font-size:11px;background:#f3f4f6;padding:1px 6px;border-radius:4px;color:#374151;">861190af</code> <code style="font-size:11px;background:#f3f4f6;padding:1px 6px;border-radius:4px;color:#374151;">a4544f2b</code>
+    </div>
+    <div style="margin-bottom:12px;">
+      <span style="font-size:11px;font-weight:600;color:#6b7280;
+                   text-transform:uppercase;letter-spacing:1px;">Key files</span><br>
+      <div style="margin-top:4px;"><span style="background:#e5e7eb;color:#374151;padding:1px 7px;border-radius:8px;font-size:11px;margin:1px 2px;display:inline-block;">taskflow/services/task_service.py</span></div>
+    </div>
+    <details>
+      <summary style="cursor:pointer;font-size:13px;font-weight:600;
+                      color:#ef4444;margin-bottom:8px;">
+        Observed changes (2 entries)
+      </summary>
+      
+<div style="border-left:3px solid #ef4444;padding:6px 12px;margin:6px 0;
+            background:#fafafa;border-radius:0 4px 4px 0;">
+  <span style="font-size:11px;color:#6b7280;font-weight:600;">
+    [diff] evidence: 861190af
+  </span>
+  <p style="margin:4px 0 0;font-size:13px;color:#374151;line-height:1.5;">
+    Commit 861190a added PAGE_SIZE=20 constant and a &#x27;page: int=1&#x27; parameter to list_tasks(). The pagination start expression written was: &#x27;start = page * PAGE_SIZE - PAGE_SIZE + 1&#x27;. The diff itself contains a comment marked &#x27;# BUG:&#x27; explaining that the formula should be &#x27;(page - 1) * PAGE_SIZE&#x27; but instead uses &#x27;page * PAGE_SIZE&#x27;, causing the first item of every page to be silently skipped.
+  </p>
+</div>
+<div style="border-left:3px solid #ef4444;padding:6px 12px;margin:6px 0;
+            background:#fafafa;border-radius:0 4px 4px 0;">
+  <span style="font-size:11px;color:#6b7280;font-weight:600;">
+    [diff] evidence: a4544f2b
+  </span>
+  <p style="margin:4px 0 0;font-size:13px;color:#374151;line-height:1.5;">
+    Commit a4544f2 removed the three lines containing the buggy formula and its comment, replacing them with a single line: &#x27;start = (page - 1) * PAGE_SIZE&#x27;. Net change: +1 line, -3 lines in task_service.py. No other files were changed.
+  </p>
+</div>
+    </details>
+    <div style="background:#f0f4ff;border:1px solid #c7d7fd;border-radius:6px;
+                padding:10px 14px;margin-top:10px;">
+      <span style="font-size:11px;font-weight:600;color:#4338ca;">
+        [INFERENCE] Feature defect and immediate repair
+      </span>
+      <p style="margin:4px 0 0;font-size:13px;color:#374151;line-height:1.5;">
+        The BUG comment in commit 861190a was present at commit time, suggesting the defect was either recognised during code review or noted for immediate correction. The fix followed within seconds of wall-clock time based on timestamps. This is an inference about authoring intent; the evidence shows only what the diffs contain.
+      </p>
+      <p style="margin:6px 0 0;font-size:12px;color:#6b7280;">
+        <em>Basis: Commit message of 861190a does not contain &#x27;bug&#x27; or &#x27;fix&#x27; wording — it reads as a normal feature commit — but the diff itself contains an explicit &#x27;# BUG:&#x27; annotation. Commit a4544f2 message begins wi...</em>
+      </p>
+    </div>
+  </div>
+</div>
+<div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;
+            margin-bottom:20px;overflow:hidden;">
+  <div style="background:#f59e0b;padding:14px 20px;display:flex;
+              align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+    <div>
+      <span style="color:rgba(255,255,255,0.7);font-size:11px;
+                   text-transform:uppercase;letter-spacing:1px;">
+        Epoch 4
+      </span>
+      <h3 style="margin:2px 0 0;color:#fff;font-size:17px;">Architectural Decoupling via Event Bus</h3>
+    </div>
+    <div style="display:flex;gap:12px;align-items:center;">
+      <span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">HIGH</span>
+      <span style="color:rgba(255,255,255,0.8);font-size:12px;">
+        1 commit(s) &nbsp;
+        +88 / -2 lines
+      </span>
+    </div>
+  </div>
+  <div style="padding:16px 20px;">
+    <p style="margin:0 0 10px;color:#374151;font-size:14px;line-height:1.6;">
+      A single refactor commit introduced a publish/subscribe EventBus and a NotificationService, removing hardwired side-effect coupling from TaskService. No new user-visible functionality was added.
+    </p>
+    <div style="margin-bottom:10px;">
+      <span style="font-size:11px;font-weight:600;color:#6b7280;
+                   text-transform:uppercase;letter-spacing:1px;">Commits: </span>
+      <code style="font-size:11px;background:#f3f4f6;padding:1px 6px;border-radius:4px;color:#374151;">c434a6f6</code>
+    </div>
+    <div style="margin-bottom:12px;">
+      <span style="font-size:11px;font-weight:600;color:#6b7280;
+                   text-transform:uppercase;letter-spacing:1px;">Key files</span><br>
+      <div style="margin-top:4px;"><span style="background:#e5e7eb;color:#374151;padding:1px 7px;border-radius:8px;font-size:11px;margin:1px 2px;display:inline-block;">taskflow/app.py</span> <span style="background:#e5e7eb;color:#374151;padding:1px 7px;border-radius:8px;font-size:11px;margin:1px 2px;display:inline-block;">taskflow/events.py</span> <span style="background:#e5e7eb;color:#374151;padding:1px 7px;border-radius:8px;font-size:11px;margin:1px 2px;display:inline-block;">taskflow/services/notification_service.py</span> <span style="background:#e5e7eb;color:#374151;padding:1px 7px;border-radius:8px;font-size:11px;margin:1px 2px;display:inline-block;">taskflow/services/task_service.py</span></div>
+    </div>
+    <details>
+      <summary style="cursor:pointer;font-size:13px;font-weight:600;
+                      color:#f59e0b;margin-bottom:8px;">
+        Observed changes (4 entries)
+      </summary>
+      
+<div style="border-left:3px solid #f59e0b;padding:6px 12px;margin:6px 0;
+            background:#fafafa;border-radius:0 4px 4px 0;">
+  <span style="font-size:11px;color:#6b7280;font-weight:600;">
+    [file_addition] evidence: c434a6f6
+  </span>
+  <p style="margin:4px 0 0;font-size:13px;color:#374151;line-height:1.5;">
+    taskflow/events.py added: EventBus class with subscribe(event, handler) and publish(event, payload) methods; handler exceptions are caught and logged but do not propagate to the caller; a module-level singleton &#x27;bus = EventBus()&#x27; created.
+  </p>
+</div>
+<div style="border-left:3px solid #f59e0b;padding:6px 12px;margin:6px 0;
+            background:#fafafa;border-radius:0 4px 4px 0;">
+  <span style="font-size:11px;color:#6b7280;font-weight:600;">
+    [file_addition] evidence: c434a6f6
+  </span>
+  <p style="margin:4px 0 0;font-size:13px;color:#374151;line-height:1.5;">
+    taskflow/services/notification_service.py added: NotificationService subscribes to &#x27;task.created&#x27;, &#x27;task.updated&#x27;, &#x27;task.deleted&#x27; events on the bus at __init__ time and appends structured log entries; docstring states &#x27;In a production system this would send emails / push messages&#x27;.
+  </p>
+</div>
+<div style="border-left:3px solid #f59e0b;padding:6px 12px;margin:6px 0;
+            background:#fafafa;border-radius:0 4px 4px 0;">
+  <span style="font-size:11px;color:#6b7280;font-weight:600;">
+    [diff] evidence: c434a6f6
+  </span>
+  <p style="margin:4px 0 0;font-size:13px;color:#374151;line-height:1.5;">
+    taskflow/services/task_service.py modified: module docstring updated to state &#x27;Architectural change: side-effects (notifications, audit) are now decoupled via the EventBus&#x27;; bus.publish() calls injected in create_task, update_task, and delete_task. Net diff: +10 lines, -2 lines.
+  </p>
+</div>
+<div style="border-left:3px solid #f59e0b;padding:6px 12px;margin:6px 0;
+            background:#fafafa;border-radius:0 4px 4px 0;">
+  <span style="font-size:11px;color:#6b7280;font-weight:600;">
+    [diff] evidence: c434a6f6
+  </span>
+  <p style="margin:4px 0 0;font-size:13px;color:#374151;line-height:1.5;">
+    taskflow/app.py modified: NotificationService imported and instantiated at application startup via app.extensions[&#x27;notifications&#x27;] = NotificationService() with inline comment &#x27;Boot the notification service so it subscribes to the event bus&#x27;.
+  </p>
+</div>
+    </details>
+    <div style="background:#f0f4ff;border:1px solid #c7d7fd;border-radius:6px;
+                padding:10px 14px;margin-top:10px;">
+      <span style="font-size:11px;font-weight:600;color:#4338ca;">
+        [INFERENCE] Observer-pattern decoupling
+      </span>
+      <p style="margin:4px 0 0;font-size:13px;color:#374151;line-height:1.5;">
+        The refactor applies an observer/event-bus pattern to break direct coupling between TaskService and its consumers. The code&#x27;s own docstring labels this an &#x27;Architectural change&#x27;, which is consistent with the structural changes visible in the diff. Calling this &#x27;intentional design improvement&#x27; is an inference supported by the docstring wording, but the underlying motivation is not independently verifiable from the repository evidence.
+      </p>
+      <p style="margin:6px 0 0;font-size:12px;color:#6b7280;">
+        <em>Basis: task_service.py docstring explicitly reads &#x27;Architectural change: side-effects … now decoupled via the EventBus&#x27;. NotificationService docstring explicitly states &#x27;In a production system this would sen...</em>
+      </p>
+    </div>
+  </div>
+</div>
+<div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;
+            margin-bottom:20px;overflow:hidden;">
+  <div style="background:#10b981;padding:14px 20px;display:flex;
+              align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+    <div>
+      <span style="color:rgba(255,255,255,0.7);font-size:11px;
+                   text-transform:uppercase;letter-spacing:1px;">
+        Epoch 5
+      </span>
+      <h3 style="margin:2px 0 0;color:#fff;font-size:17px;">Quality Assurance and Security Hardening</h3>
+    </div>
+    <div style="display:flex;gap:12px;align-items:center;">
+      <span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">HIGH</span>
+      <span style="color:rgba(255,255,255,0.8);font-size:12px;">
+        2 commit(s) &nbsp;
+        +259 / -1 lines
+      </span>
+    </div>
+  </div>
+  <div style="padding:16px 20px;">
+    <p style="margin:0 0 10px;color:#374151;font-size:14px;line-height:1.6;">
+      A pytest test suite (34 test cases across 4 files) was added covering the Task model, TaskService, AuthService, and EventBus. A separate security commit added brute-force rate limiting on the login endpoint and input length validation on registration.
+    </p>
+    <div style="margin-bottom:10px;">
+      <span style="font-size:11px;font-weight:600;color:#6b7280;
+                   text-transform:uppercase;letter-spacing:1px;">Commits: </span>
+      <code style="font-size:11px;background:#f3f4f6;padding:1px 6px;border-radius:4px;color:#374151;">af36d821</code> <code style="font-size:11px;background:#f3f4f6;padding:1px 6px;border-radius:4px;color:#374151;">a2116ca9</code>
+    </div>
+    <div style="margin-bottom:12px;">
+      <span style="font-size:11px;font-weight:600;color:#6b7280;
+                   text-transform:uppercase;letter-spacing:1px;">Key files</span><br>
+      <div style="margin-top:4px;"><span style="background:#e5e7eb;color:#374151;padding:1px 7px;border-radius:8px;font-size:11px;margin:1px 2px;display:inline-block;">README.md</span> <span style="background:#e5e7eb;color:#374151;padding:1px 7px;border-radius:8px;font-size:11px;margin:1px 2px;display:inline-block;">taskflow/api/auth.py</span> <span style="background:#e5e7eb;color:#374151;padding:1px 7px;border-radius:8px;font-size:11px;margin:1px 2px;display:inline-block;">taskflow/security/rate_limiter.py</span> <span style="background:#e5e7eb;color:#374151;padding:1px 7px;border-radius:8px;font-size:11px;margin:1px 2px;display:inline-block;">taskflow/tests/test_auth_service.py</span> <span style="background:#e5e7eb;color:#374151;padding:1px 7px;border-radius:8px;font-size:11px;margin:1px 2px;display:inline-block;">taskflow/tests/test_event_bus.py</span> <span style="background:#e5e7eb;color:#374151;padding:1px 7px;border-radius:8px;font-size:11px;margin:1px 2px;display:inline-block;">taskflow/tests/test_task_model.py</span> <span style="background:#e5e7eb;color:#374151;padding:1px 7px;border-radius:8px;font-size:11px;margin:1px 2px;display:inline-block;">taskflow/tests/test_task_service.py</span></div>
+    </div>
+    <details>
+      <summary style="cursor:pointer;font-size:13px;font-weight:600;
+                      color:#10b981;margin-bottom:8px;">
+        Observed changes (4 entries)
+      </summary>
+      
+<div style="border-left:3px solid #10b981;padding:6px 12px;margin:6px 0;
+            background:#fafafa;border-radius:0 4px 4px 0;">
+  <span style="font-size:11px;color:#6b7280;font-weight:600;">
+    [file_addition] evidence: af36d821
+  </span>
+  <p style="margin:4px 0 0;font-size:13px;color:#374151;line-height:1.5;">
+    af36d82 added 4 test files (194 lines total) under taskflow/tests/: test_task_model.py (6 test functions covering Task defaults, invalid priority, status update, unknown-field update, to_dict keys), test_task_service.py (8 test functions covering create/retrieve, empty list, status filter, pagination pages 1 and 2, delete, error cases), test_auth_service.py (7 test functions covering register/login, duplicate username, wrong password, unknown user, logout invalidation, admin role), test_event_bus.py (4 test functions covering subscribe/publish, multiple subscribers, no-subscriber safety, handler exception isolation).
+  </p>
+</div>
+<div style="border-left:3px solid #10b981;padding:6px 12px;margin:6px 0;
+            background:#fafafa;border-radius:0 4px 4px 0;">
+  <span style="font-size:11px;color:#6b7280;font-weight:600;">
+    [file_addition] evidence: a2116ca9
+  </span>
+  <p style="margin:4px 0 0;font-size:13px;color:#374151;line-height:1.5;">
+    a2116ca added taskflow/security/rate_limiter.py: RateLimiter class tracking failed login attempts per username using time.monotonic(); MAX_ATTEMPTS=5 and LOCKOUT_SECONDS=300 constants; module-level singleton rate_limiter; record_failure, is_locked, and clear methods.
+  </p>
+</div>
+<div style="border-left:3px solid #10b981;padding:6px 12px;margin:6px 0;
+            background:#fafafa;border-radius:0 4px 4px 0;">
+  <span style="font-size:11px;color:#6b7280;font-weight:600;">
+    [diff] evidence: a2116ca9
+  </span>
+  <p style="margin:4px 0 0;font-size:13px;color:#374151;line-height:1.5;">
+    a2116ca modified taskflow/api/auth.py (+26 lines, -1 line): import of rate_limiter added; input length constants added (_MAX_USERNAME=64, _MAX_EMAIL=254, _MAX_PASSWORD=128); register() now validates all three field lengths and enforces minimum password length of 8 characters; login() checks rate_limiter.is_locked() before attempting authentication, records failures with record_failure(), clears on success.
+  </p>
+</div>
+<div style="border-left:3px solid #10b981;padding:6px 12px;margin:6px 0;
+            background:#fafafa;border-radius:0 4px 4px 0;">
+  <span style="font-size:11px;color:#6b7280;font-weight:600;">
+    [diff] evidence: a2116ca9
+  </span>
+  <p style="margin:4px 0 0;font-size:13px;color:#374151;line-height:1.5;">
+    README.md updated in a2116ca to add two feature bullet points: &#x27;Token-based authentication with brute-force rate limiting&#x27; and &#x27;Input validation on all endpoints&#x27;.
+  </p>
+</div>
+    </details>
+    <div style="background:#f0f4ff;border:1px solid #c7d7fd;border-radius:6px;
+                padding:10px 14px;margin-top:10px;">
+      <span style="font-size:11px;font-weight:600;color:#4338ca;">
+        [INFERENCE] Production readiness investment
+      </span>
+      <p style="margin:4px 0 0;font-size:13px;color:#374151;line-height:1.5;">
+        The test suite and security hardening together suggest a shift from feature development toward production readiness — adding verifiability (tests) and resistance to abuse (rate limiting). This interpretation is consistent with the evidence but is an inference; the commits themselves do not state this motivation explicitly.
+      </p>
+      <p style="margin:6px 0 0;font-size:12px;color:#6b7280;">
+        <em>Basis: af36d82 commit message references 34 test cases, implying comprehensive coverage intent. a2116ca commit message explicitly names &#x27;max 5 attempts / 5 min&#x27;, suggesting a deliberate security policy. READ...</em>
+      </p>
+    </div>
+  </div>
+</div>
+
+<div style="border-left:4px solid #3b82d4;padding:4px 0 4px 16px;margin-bottom:24px;">
+  <h2 style="margin:0;font-size:22px;color:#1f2328;">&#10067; Why Did These Changes Happen?</h2>
+  <p style="color:#6b7280;margin:4px 0 0;font-size:14px;">Evidence-grounded reasoning — four-voice analysis per change</p>
+</div>
+<div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;
+            margin-bottom:20px;overflow:hidden;">
+  <div style="background:#1e3a5f;padding:12px 20px;display:flex;
+              align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+    <div>
+      <span style="color:rgba(255,255,255,0.6);font-size:11px;">
+        why_1
+      </span>
+      <h3 style="margin:2px 0 0;color:#fff;font-size:16px;">Introduction of user authentication</h3>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">HIGH</span>
+      <code style="font-size:11px;background:#f3f4f6;padding:1px 6px;border-radius:4px;">967b11aa</code>
+    </div>
+  </div>
+  <div style="padding:16px 20px;">
+    
+<div style="background:#e0f2fe;border-left:3px solid #0369a1;border-radius:0 6px 6px 0;
+            padding:10px 14px;margin:6px 0;">
+  <div style="font-size:11px;font-weight:700;color:#0369a1;margin-bottom:4px;">&#128269; Observed Change</div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">taskflow/models/user.py was added: a User class with user_id, username, email, password_hash, role (&#x27;admin&#x27;|&#x27;member&#x27;), is_active, and created_at fields. taskflow/services/auth_service.py was added: AuthService implementing register() with SHA-256 password hashing (secrets.token_hex(16) salt, format &#x27;salt$hash&#x27;), login() returning secrets.token_urlsafe(32) session tokens, logout(), get_user_by_token(), and require_admin(). config.py was updated from VERSION=0.1.0 to VERSION=0.2.0 and SESSION_TOKEN_LENGTH=32 was added.</p>
+</div>
+    
+<div style="background:#f0fdf4;border-left:3px solid #15803d;border-radius:0 6px 6px 0;
+            padding:10px 14px;margin:6px 0;">
+  <div style="font-size:11px;font-weight:700;color:#15803d;margin-bottom:4px;">&#128172; Stated Intent</div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">The commit message states: &#x27;feat: introduce authentication — User model, AuthService with hashed passwords and session tokens&#x27;. This explicitly names the deliverables (User model, AuthService, hashed passwords, session tokens) but does not state the reason for introducing authentication at this point in development.</p>
+</div>
+    
+<div style="background:#faf5ff;border-left:3px solid #7c3aed;border-radius:0 6px 6px 0;
+            padding:10px 14px;margin:6px 0;">
+  <div style="font-size:11px;font-weight:700;color:#7c3aed;margin-bottom:4px;">&#129300; [INFERENCE] Evidence-Based</div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">[INFERENCE] The authentication layer was introduced before the HTTP API (commit c5040fb, which is 2 commits later). The API layer&#x27;s auth_middleware.py depends on AuthService.get_user_by_token(), and every task endpoint in taskflow/api/tasks.py is decorated with @require_token. This ordering — auth before HTTP surface — is consistent with a design approach where access control is established before the network interface is opened. However, the repository evidence shows only the ordering, not an explicit design document or rationale. The role field (&#x27;admin&#x27;|&#x27;member&#x27;) and require_admin() method s...</p>
+</div>
+    
+<div style="background:#fff7ed;border-left:3px solid #c2410c;border-radius:0 6px 6px 0;
+            padding:10px 14px;margin:6px 0;">
+  <div style="font-size:11px;font-weight:700;color:#c2410c;margin-bottom:4px;">&#10067; Unknown</div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">The repository contains no evidence explaining: (1) why authentication was considered necessary at this stage rather than added later; (2) what external requirement or trigger prompted its introduction; (3) why SHA-256 with a random salt was chosen over other mechanisms (no comment or document explains this); (4) why the admin role was introduced when no admin-specific endpoints exist in the repository.</p>
+</div>
+    <details style="margin-top:10px;">
+      <summary style="cursor:pointer;font-size:12px;color:#6b7280;">
+        Evidence commits (1)
+      </summary>
+      <div style="margin-top:6px;">
+<div style="font-size:12px;background:#f7f8fa;border:1px solid #e5e7eb;
+            border-radius:4px;padding:8px 12px;margin:4px 0;">
+  <code style="color:#374151;">967b11aa</code>
+  &rarr; <span style="color:#6b7280;">taskflow/models/user.py, taskflow/services/auth_service.py, config.py</span><br>
+  <span style="color:#374151;font-style:italic;">Adds the complete authentication layer. Diff shows SHA-256 + salt password hashing, secrets-module token generation, role field on User, and require_a</span>
+</div></div>
+    </details>
+  </div>
+</div>
+<div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;
+            margin-bottom:20px;overflow:hidden;">
+  <div style="background:#1e3a5f;padding:12px 20px;display:flex;
+              align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+    <div>
+      <span style="color:rgba(255,255,255,0.6);font-size:11px;">
+        why_2
+      </span>
+      <h3 style="margin:2px 0 0;color:#fff;font-size:16px;">Introduction of SQLite persistence layer</h3>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">HIGH</span>
+      <code style="font-size:11px;background:#f3f4f6;padding:1px 6px;border-radius:4px;">c8491ae3</code>
+    </div>
+  </div>
+  <div style="padding:16px 20px;">
+    
+<div style="background:#e0f2fe;border-left:3px solid #0369a1;border-radius:0 6px 6px 0;
+            padding:10px 14px;margin:6px 0;">
+  <div style="font-size:11px;font-weight:700;color:#0369a1;margin-bottom:4px;">&#128269; Observed Change</div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">taskflow/db.py was added: sqlite3 connection context manager get_connection() with row_factory=sqlite3.Row, PRAGMA foreign_keys=ON, rollback on exception, and initialize_db() creating &#x27;users&#x27; and &#x27;tasks&#x27; tables using CREATE TABLE IF NOT EXISTS DDL. taskflow/models/task_repository.py was added: TaskRepository with save() using INSERT...ON CONFLICT(task_id) DO UPDATE, find_by_id(), find_all() with optional status filter, and delete(). taskflow/models/user_repository.py was added: UserRepository with equivalent upsert and find operations. config.py gained DATABASE_PATH = &#x27;taskflow.db&#x27; and VERSION...</p>
+</div>
+    
+<div style="background:#f0fdf4;border-left:3px solid #15803d;border-radius:0 6px 6px 0;
+            padding:10px 14px;margin:6px 0;">
+  <div style="font-size:11px;font-weight:700;color:#15803d;margin-bottom:4px;">&#128172; Stated Intent</div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">The commit message states: &#x27;feat: add SQLite persistence layer — db module, TaskRepository, UserRepository&#x27;. This describes what was added but does not state why persistence was introduced at this point or why SQLite was chosen.</p>
+</div>
+    
+<div style="background:#faf5ff;border-left:3px solid #7c3aed;border-radius:0 6px 6px 0;
+            padding:10px 14px;margin:6px 0;">
+  <div style="font-size:11px;font-weight:700;color:#7c3aed;margin-bottom:4px;">&#129300; [INFERENCE] Evidence-Based</div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">[INFERENCE] The .gitignore in commit 79b1b0c (the very first commit) already contains the pattern &#x27;*.db&#x27;, indicating that SQLite database files were anticipated before any persistence code existed. This is consistent with SQLite being planned from the beginning, though it does not prove intent — it is possible the .gitignore entry was added as a general precaution. The TaskService (task_service.py) continues to use its in-memory dict store throughout the entire 10-commit history; the repositories are created in this commit but are never wired into TaskService in any subsequent commit present i...</p>
+</div>
+    
+<div style="background:#fff7ed;border-left:3px solid #c2410c;border-radius:0 6px 6px 0;
+            padding:10px 14px;margin:6px 0;">
+  <div style="font-size:11px;font-weight:700;color:#c2410c;margin-bottom:4px;">&#10067; Unknown</div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">The repository contains no evidence explaining: (1) why SQLite was chosen over other storage approaches; (2) why the repositories were not connected to TaskService in any commit in the repository — it is unknown whether this was planned but not yet done, or a deliberate staging; (3) what requirement or trigger caused persistence to be introduced after auth but before the HTTP API.</p>
+</div>
+    <details style="margin-top:10px;">
+      <summary style="cursor:pointer;font-size:12px;color:#6b7280;">
+        Evidence commits (1)
+      </summary>
+      <div style="margin-top:6px;">
+<div style="font-size:12px;background:#f7f8fa;border:1px solid #e5e7eb;
+            border-radius:4px;padding:8px 12px;margin:4px 0;">
+  <code style="color:#374151;">c8491ae3</code>
+  &rarr; <span style="color:#6b7280;">taskflow/db.py, taskflow/models/task_repository.py, taskflow/models/user_repository.py, config.py</span><br>
+  <span style="color:#374151;font-style:italic;">Adds the complete persistence layer. Diff of db.py shows SQLite connection management and DDL. Diff of task_repository.py shows upsert pattern. .gitig</span>
+</div></div>
+    </details>
+  </div>
+</div>
+<div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;
+            margin-bottom:20px;overflow:hidden;">
+  <div style="background:#1e3a5f;padding:12px 20px;display:flex;
+              align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+    <div>
+      <span style="color:rgba(255,255,255,0.6);font-size:11px;">
+        why_3
+      </span>
+      <h3 style="margin:2px 0 0;color:#fff;font-size:16px;">Introduction of Flask REST API</h3>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">HIGH</span>
+      <code style="font-size:11px;background:#f3f4f6;padding:1px 6px;border-radius:4px;">c5040fb5</code>
+    </div>
+  </div>
+  <div style="padding:16px 20px;">
+    
+<div style="background:#e0f2fe;border-left:3px solid #0369a1;border-radius:0 6px 6px 0;
+            padding:10px 14px;margin:6px 0;">
+  <div style="font-size:11px;font-weight:700;color:#0369a1;margin-bottom:4px;">&#128269; Observed Change</div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">taskflow/api/tasks.py was added: Flask Blueprint at /api/tasks with five HTTP handlers (GET list, POST create, GET by id, PATCH update, DELETE), all decorated with @require_token. taskflow/api/auth.py was added: Blueprint at /api/auth with /register (POST), /login (POST returning token), /logout (POST). taskflow/api/auth_middleware.py was added: require_token decorator reading X-Auth-Token request header, returning HTTP 401 when absent or invalid. taskflow/app.py was added: create_app() factory calling initialize_db() and registering both blueprints. main.py was reduced from 20 lines to 8 line...</p>
+</div>
+    
+<div style="background:#f0fdf4;border-left:3px solid #15803d;border-radius:0 6px 6px 0;
+            padding:10px 14px;margin:6px 0;">
+  <div style="font-size:11px;font-weight:700;color:#15803d;margin-bottom:4px;">&#128172; Stated Intent</div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">The commit message states: &#x27;feat: add Flask REST API layer — tasks and auth blueprints, app factory, auth middleware&#x27;. This names the components introduced but does not state why the HTTP surface was added or what consumer was intended. The app.run() call in main.py specifies host=&#x27;0.0.0.0&#x27;, port=5000, indicating the server was intended to accept connections on all interfaces at port 5000 — this is a directly observable configuration choice, not an inferred one.</p>
+</div>
+    
+<div style="background:#faf5ff;border-left:3px solid #7c3aed;border-radius:0 6px 6px 0;
+            padding:10px 14px;margin:6px 0;">
+  <div style="font-size:11px;font-weight:700;color:#7c3aed;margin-bottom:4px;">&#129300; [INFERENCE] Evidence-Based</div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">[INFERENCE] flask==2.3.2 and Werkzeug==2.3.6 were present in requirements.txt from the very first commit (79b1b0c), before any Flask code existed. This is consistent with Flask being intended as the HTTP framework from the start of the project. The addition of pytest to requirements.txt in the same commit as the API — rather than with the test files (which arrive two commits later in af36d82) — suggests test infrastructure was prepared alongside the API surface, though the tests themselves were not written at this point. The removal of the script-mode main.py demo in favour of app.run() marks ...</p>
+</div>
+    
+<div style="background:#fff7ed;border-left:3px solid #c2410c;border-radius:0 6px 6px 0;
+            padding:10px 14px;margin:6px 0;">
+  <div style="font-size:11px;font-weight:700;color:#c2410c;margin-bottom:4px;">&#10067; Unknown</div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">The repository contains no evidence explaining: (1) what client or consumer was intended to use this API; (2) why host=&#x27;0.0.0.0&#x27; was chosen over &#x27;127.0.0.1&#x27; (this could indicate network-accessible deployment intent or simply a default choice — the repository does not clarify); (3) why pytest was added here rather than with the test files; (4) no API documentation, OpenAPI spec, or consumer code exists in the repository to indicate what the API was designed to serve.</p>
+</div>
+    <details style="margin-top:10px;">
+      <summary style="cursor:pointer;font-size:12px;color:#6b7280;">
+        Evidence commits (1)
+      </summary>
+      <div style="margin-top:6px;">
+<div style="font-size:12px;background:#f7f8fa;border:1px solid #e5e7eb;
+            border-radius:4px;padding:8px 12px;margin:4px 0;">
+  <code style="color:#374151;">c5040fb5</code>
+  &rarr; <span style="color:#6b7280;">taskflow/api/tasks.py, taskflow/api/auth.py, taskflow/api/auth_middleware.py, taskflow/app.py, main.py, requirements.txt</span><br>
+  <span style="color:#374151;font-style:italic;">Adds the entire HTTP surface. Diff shows Blueprint routes, require_token middleware, app factory, and replacement of the script-mode entry point with </span>
+</div></div>
+    </details>
+  </div>
+</div>
+<div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;
+            margin-bottom:20px;overflow:hidden;">
+  <div style="background:#1e3a5f;padding:12px 20px;display:flex;
+              align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+    <div>
+      <span style="color:rgba(255,255,255,0.6);font-size:11px;">
+        why_4
+      </span>
+      <h3 style="margin:2px 0 0;color:#fff;font-size:16px;">Pagination introduction with off-by-one defect</h3>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">HIGH</span>
+      <code style="font-size:11px;background:#f3f4f6;padding:1px 6px;border-radius:4px;">861190af</code>
+    </div>
+  </div>
+  <div style="padding:16px 20px;">
+    
+<div style="background:#e0f2fe;border-left:3px solid #0369a1;border-radius:0 6px 6px 0;
+            padding:10px 14px;margin:6px 0;">
+  <div style="font-size:11px;font-weight:700;color:#0369a1;margin-bottom:4px;">&#128269; Observed Change</div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">taskflow/services/task_service.py was modified: PAGE_SIZE=20 constant added at module level. list_tasks() signature changed from &#x27;(self, status=None)&#x27; to &#x27;(self, status=None, page=1)&#x27;. The slicing expression &#x27;return tasks[start: start + PAGE_SIZE]&#x27; was added. The start index was computed as: &#x27;start = page * PAGE_SIZE - PAGE_SIZE + 1&#x27;. The diff contains an explicit comment block: &#x27;# BUG: should be (page - 1) * PAGE_SIZE but uses page * PAGE_SIZE, / causing the first item of every page to be silently skipped.&#x27; No other files were changed. Net diff: +7 lines, -2 lines.</p>
+</div>
+    
+<div style="background:#f0fdf4;border-left:3px solid #15803d;border-radius:0 6px 6px 0;
+            padding:10px 14px;margin:6px 0;">
+  <div style="font-size:11px;font-weight:700;color:#15803d;margin-bottom:4px;">&#128172; Stated Intent</div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">The commit message states: &#x27;feat: add pagination to list_tasks (page/page_size support)&#x27;. The word &#x27;feat:&#x27; classifies this as a feature addition. The message names &#x27;page/page_size support&#x27; as the deliverable. The diff&#x27;s embedded &#x27;# BUG:&#x27; comment was part of the committed code and is therefore repository evidence, not a post-hoc annotation — it was present at commit time.</p>
+</div>
+    
+<div style="background:#faf5ff;border-left:3px solid #7c3aed;border-radius:0 6px 6px 0;
+            padding:10px 14px;margin:6px 0;">
+  <div style="font-size:11px;font-weight:700;color:#7c3aed;margin-bottom:4px;">&#129300; [INFERENCE] Evidence-Based</div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">[INFERENCE] Pagination is typically introduced when a list endpoint is expected to handle more items than are practical to return in a single response. However, the repository contains no evidence of any data volume concern, no issue tracker reference, and no comment explaining the threshold (PAGE_SIZE=20) beyond the constant&#x27;s name. The presence of the &#x27;# BUG:&#x27; comment within the committed code is unusual. One inference is that the defect was identified during the writing of this commit but the code was committed before the fix was applied; the immediately following commit (a4544f2, titled &#x27;f...</p>
+</div>
+    
+<div style="background:#fff7ed;border-left:3px solid #c2410c;border-radius:0 6px 6px 0;
+            padding:10px 14px;margin:6px 0;">
+  <div style="font-size:11px;font-weight:700;color:#c2410c;margin-bottom:4px;">&#10067; Unknown</div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">The repository contains no evidence explaining: (1) what prompted pagination to be added at this point — no issue reference, no complaint about list size, no performance concern is documented; (2) why PAGE_SIZE=20 was chosen; (3) why the defect was committed rather than corrected before committing — whether this was a review miss, an intentional staging, or a note-to-self cannot be determined from the repository evidence.</p>
+</div>
+    <details style="margin-top:10px;">
+      <summary style="cursor:pointer;font-size:12px;color:#6b7280;">
+        Evidence commits (1)
+      </summary>
+      <div style="margin-top:6px;">
+<div style="font-size:12px;background:#f7f8fa;border:1px solid #e5e7eb;
+            border-radius:4px;padding:8px 12px;margin:4px 0;">
+  <code style="color:#374151;">861190af</code>
+  &rarr; <span style="color:#6b7280;">taskflow/services/task_service.py</span><br>
+  <span style="color:#374151;font-style:italic;">Only file changed. Diff shows PAGE_SIZE constant, page parameter addition, and the explicit &#x27;# BUG:&#x27; comment within the committed lines — all directly</span>
+</div></div>
+    </details>
+  </div>
+</div>
+<div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;
+            margin-bottom:20px;overflow:hidden;">
+  <div style="background:#1e3a5f;padding:12px 20px;display:flex;
+              align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+    <div>
+      <span style="color:rgba(255,255,255,0.6);font-size:11px;">
+        why_5
+      </span>
+      <h3 style="margin:2px 0 0;color:#fff;font-size:16px;">Pagination off-by-one bug correction</h3>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">HIGH</span>
+      <code style="font-size:11px;background:#f3f4f6;padding:1px 6px;border-radius:4px;">a4544f2b</code>
+    </div>
+  </div>
+  <div style="padding:16px 20px;">
+    
+<div style="background:#e0f2fe;border-left:3px solid #0369a1;border-radius:0 6px 6px 0;
+            padding:10px 14px;margin:6px 0;">
+  <div style="font-size:11px;font-weight:700;color:#0369a1;margin-bottom:4px;">&#128269; Observed Change</div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">taskflow/services/task_service.py was modified. The three lines introduced in commit 861190a — specifically the &#x27;# BUG:&#x27; comment (two lines) and the defective expression &#x27;start = page * PAGE_SIZE - PAGE_SIZE + 1&#x27; — were removed. They were replaced with a single line: &#x27;start = (page - 1) * PAGE_SIZE&#x27;. No other files were changed. Net diff: +1 line, -3 lines.</p>
+</div>
+    
+<div style="background:#f0fdf4;border-left:3px solid #15803d;border-radius:0 6px 6px 0;
+            padding:10px 14px;margin:6px 0;">
+  <div style="font-size:11px;font-weight:700;color:#15803d;margin-bottom:4px;">&#128172; Stated Intent</div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">The commit message states: &#x27;fix: correct off-by-one in list_tasks pagination (start index was skipping first item per page)&#x27;. The &#x27;fix:&#x27; prefix classifies this as a bug fix. The message names the symptom explicitly: &#x27;start index was skipping first item per page&#x27;. This description matches the &#x27;# BUG:&#x27; comment in the prior commit which stated &#x27;causing the first item of every page to be silently skipped&#x27; — the language is consistent across both commits.</p>
+</div>
+    
+<div style="background:#faf5ff;border-left:3px solid #7c3aed;border-radius:0 6px 6px 0;
+            padding:10px 14px;margin:6px 0;">
+  <div style="font-size:11px;font-weight:700;color:#7c3aed;margin-bottom:4px;">&#129300; [INFERENCE] Evidence-Based</div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">[INFERENCE] The fix expression &#x27;(page - 1) * PAGE_SIZE&#x27; produces start=0 for page=1, which is the correct zero-based index for the first page. The defective expression &#x27;page * PAGE_SIZE - PAGE_SIZE + 1&#x27; produces start=1 for page=1, which skips the first element — matching the bug description in both the prior commit&#x27;s comment and this commit&#x27;s message. The mathematical correction is directly verifiable from the diff. The &#x27;# BUG:&#x27; annotation in commit 861190a and the &#x27;fix:&#x27; message here, taken together, provide strong evidence that the defect was identified before the fix commit was made, thoug...</p>
+</div>
+    
+<div style="background:#fff7ed;border-left:3px solid #c2410c;border-radius:0 6px 6px 0;
+            padding:10px 14px;margin:6px 0;">
+  <div style="font-size:11px;font-weight:700;color:#c2410c;margin-bottom:4px;">&#10067; Unknown</div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">The repository contains no evidence of: (1) how the defect was discovered — there are no test failures, no issue references, and no test covering pagination correctness at this point in history (tests arrive two commits later in af36d82); (2) whether the bug was observed in a running system or caught by inspection of the just-written code.</p>
+</div>
+    <details style="margin-top:10px;">
+      <summary style="cursor:pointer;font-size:12px;color:#6b7280;">
+        Evidence commits (2)
+      </summary>
+      <div style="margin-top:6px;">
+<div style="font-size:12px;background:#f7f8fa;border:1px solid #e5e7eb;
+            border-radius:4px;padding:8px 12px;margin:4px 0;">
+  <code style="color:#374151;">a4544f2b</code>
+  &rarr; <span style="color:#6b7280;">taskflow/services/task_service.py</span><br>
+  <span style="color:#374151;font-style:italic;">The fix commit. Diff removes exactly the three &#x27;# BUG:&#x27; lines from commit 861190a and substitutes the correct expression.</span>
+</div>
+<div style="font-size:12px;background:#f7f8fa;border:1px solid #e5e7eb;
+            border-radius:4px;padding:8px 12px;margin:4px 0;">
+  <code style="color:#374151;">861190af</code>
+  &rarr; <span style="color:#6b7280;">taskflow/services/task_service.py</span><br>
+  <span style="color:#374151;font-style:italic;">The prior commit that introduced the defect. Its diff contains the &#x27;# BUG:&#x27; annotation describing the problem that a4544f2 fixes.</span>
+</div></div>
+    </details>
+  </div>
+</div>
+<div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;
+            margin-bottom:20px;overflow:hidden;">
+  <div style="background:#1e3a5f;padding:12px 20px;display:flex;
+              align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+    <div>
+      <span style="color:rgba(255,255,255,0.6);font-size:11px;">
+        why_6
+      </span>
+      <h3 style="margin:2px 0 0;color:#fff;font-size:16px;">EventBus architectural decoupling</h3>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">HIGH</span>
+      <code style="font-size:11px;background:#f3f4f6;padding:1px 6px;border-radius:4px;">c434a6f6</code>
+    </div>
+  </div>
+  <div style="padding:16px 20px;">
+    
+<div style="background:#e0f2fe;border-left:3px solid #0369a1;border-radius:0 6px 6px 0;
+            padding:10px 14px;margin:6px 0;">
+  <div style="font-size:11px;font-weight:700;color:#0369a1;margin-bottom:4px;">&#128269; Observed Change</div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">taskflow/events.py was added: EventBus class with subscribe(event, handler) and publish(event, payload) methods; handler exceptions are caught and suppressed with the comment &#x27;Handlers must not crash the publisher&#x27;; module-level singleton &#x27;bus = EventBus()&#x27; created. taskflow/services/notification_service.py was added: NotificationService subscribes to &#x27;task.created&#x27;, &#x27;task.updated&#x27;, &#x27;task.deleted&#x27; events; records structured log entries with timestamp, action, task_id, detail. taskflow/services/task_service.py was modified: module docstring updated; bus.publish() calls injected into create_task...</p>
+</div>
+    
+<div style="background:#f0fdf4;border-left:3px solid #15803d;border-radius:0 6px 6px 0;
+            padding:10px 14px;margin:6px 0;">
+  <div style="font-size:11px;font-weight:700;color:#15803d;margin-bottom:4px;">&#128172; Stated Intent</div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">The commit message states: &#x27;refactor: introduce EventBus and NotificationService — decouple task side-effects from TaskService&#x27;. The &#x27;refactor:&#x27; prefix classifies this as a structural change without new external functionality. The message explicitly names decoupling task side-effects from TaskService as the goal. task_service.py&#x27;s updated module docstring reads: &#x27;Architectural change: side-effects (notifications, audit) are now decoupled via the EventBus rather than being hardwired here.&#x27; NotificationService&#x27;s docstring states: &#x27;In a production system this would send emails / push messages.&#x27; a...</p>
+</div>
+    
+<div style="background:#faf5ff;border-left:3px solid #7c3aed;border-radius:0 6px 6px 0;
+            padding:10px 14px;margin:6px 0;">
+  <div style="font-size:11px;font-weight:700;color:#7c3aed;margin-bottom:4px;">&#129300; [INFERENCE] Evidence-Based</div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">[INFERENCE] The phrase &#x27;rather than being hardwired here&#x27; in the task_service.py docstring implies that side-effects were considered to have been hardwired previously, even though no direct coupling to notification code existed in prior commits — TaskService had no notification logic before this commit. This suggests the refactor was anticipatory: building the decoupling infrastructure before hardwiring would have occurred, rather than removing existing coupling. The NotificationService docstring&#x27;s reference to &#x27;a production system&#x27; suggests this was written with a future production use case i...</p>
+</div>
+    
+<div style="background:#fff7ed;border-left:3px solid #c2410c;border-radius:0 6px 6px 0;
+            padding:10px 14px;margin:6px 0;">
+  <div style="font-size:11px;font-weight:700;color:#c2410c;margin-bottom:4px;">&#10067; Unknown</div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">The repository contains no evidence explaining: (1) what specific side-effect behaviour was considered problematic or would have been &#x27;hardwired&#x27; — no prior version of TaskService contained any notification or side-effect code; (2) what &#x27;emails / push messages&#x27; in a production system refers to — no email configuration, no push service integration, and no product requirements document exists in the repository; (3) why this refactor was performed between the bug fix and the test suite rather than at any other point.</p>
+</div>
+    <details style="margin-top:10px;">
+      <summary style="cursor:pointer;font-size:12px;color:#6b7280;">
+        Evidence commits (1)
+      </summary>
+      <div style="margin-top:6px;">
+<div style="font-size:12px;background:#f7f8fa;border:1px solid #e5e7eb;
+            border-radius:4px;padding:8px 12px;margin:4px 0;">
+  <code style="color:#374151;">c434a6f6</code>
+  &rarr; <span style="color:#6b7280;">taskflow/events.py, taskflow/services/notification_service.py, taskflow/services/task_service.py, taskflow/app.py</span><br>
+  <span style="color:#374151;font-style:italic;">Single commit making all changes. Diff of events.py shows EventBus design. Diff of notification_service.py shows &#x27;production system&#x27; docstring. Diff o</span>
+</div></div>
+    </details>
+  </div>
+</div>
+<div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;
+            margin-bottom:20px;overflow:hidden;">
+  <div style="background:#1e3a5f;padding:12px 20px;display:flex;
+              align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+    <div>
+      <span style="color:rgba(255,255,255,0.6);font-size:11px;">
+        why_7
+      </span>
+      <h3 style="margin:2px 0 0;color:#fff;font-size:16px;">Introduction of automated test suite</h3>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">HIGH</span>
+      <code style="font-size:11px;background:#f3f4f6;padding:1px 6px;border-radius:4px;">af36d821</code>
+    </div>
+  </div>
+  <div style="padding:16px 20px;">
+    
+<div style="background:#e0f2fe;border-left:3px solid #0369a1;border-radius:0 6px 6px 0;
+            padding:10px 14px;margin:6px 0;">
+  <div style="font-size:11px;font-weight:700;color:#0369a1;margin-bottom:4px;">&#128269; Observed Change</div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">Four test files were added (194 lines total) under taskflow/tests/: test_task_model.py (6 test functions: defaults, invalid priority, status update, invalid status, unknown field, to_dict keys); test_task_service.py (8 test functions: create/retrieve, empty list, status filter, pagination page 1, pagination page 2, delete, delete nonexistent, update nonexistent); test_auth_service.py (7 test functions: register/login, duplicate username, wrong password, unknown user, logout invalidation, admin rejection, admin acceptance); test_event_bus.py (4 test functions: subscribe/publish, multiple subscr...</p>
+</div>
+    
+<div style="background:#f0fdf4;border-left:3px solid #15803d;border-radius:0 6px 6px 0;
+            padding:10px 14px;margin:6px 0;">
+  <div style="font-size:11px;font-weight:700;color:#15803d;margin-bottom:4px;">&#128172; Stated Intent</div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">The commit message states: &#x27;test: add pytest suite — Task model, TaskService, AuthService, EventBus (34 test cases)&#x27;. The &#x27;test:&#x27; prefix classifies this as a test addition. The message enumerates the four components tested and names 34 test cases as the count. No commit message text explains why the tests were added at this point rather than earlier.</p>
+</div>
+    
+<div style="background:#faf5ff;border-left:3px solid #7c3aed;border-radius:0 6px 6px 0;
+            padding:10px 14px;margin:6px 0;">
+  <div style="font-size:11px;font-weight:700;color:#7c3aed;margin-bottom:4px;">&#129300; [INFERENCE] Evidence-Based</div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">[INFERENCE] pytest was added to requirements.txt two commits before the test files (in c5040fb). This ordering — declaring the test framework before writing tests — is consistent with planned test addition but does not prove it. The test suite covers all four components that existed at this point (Task, TaskService, AuthService, EventBus) but does not cover the API endpoints (taskflow/api/*.py) or the repositories (task_repository.py, user_repository.py). test_task_service.py&#x27;s pagination test asserts page1[0].title == &#x27;Task 0&#x27;, which verifies the corrected formula from a4544f2 rather than the...</p>
+</div>
+    
+<div style="background:#fff7ed;border-left:3px solid #c2410c;border-radius:0 6px 6px 0;
+            padding:10px 14px;margin:6px 0;">
+  <div style="font-size:11px;font-weight:700;color:#c2410c;margin-bottom:4px;">&#10067; Unknown</div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">The repository contains no evidence explaining: (1) why tests were added after 8 of the 10 commits rather than alongside the code they test; (2) why the API endpoints and repositories are not covered by the test suite; (3) whether the 34-test count in the commit message was a target or a result; (4) there is no CI configuration, no test-running script, and no record of any test run in the repository — it is unknown whether these tests were ever executed.</p>
+</div>
+    <details style="margin-top:10px;">
+      <summary style="cursor:pointer;font-size:12px;color:#6b7280;">
+        Evidence commits (2)
+      </summary>
+      <div style="margin-top:6px;">
+<div style="font-size:12px;background:#f7f8fa;border:1px solid #e5e7eb;
+            border-radius:4px;padding:8px 12px;margin:4px 0;">
+  <code style="color:#374151;">af36d821</code>
+  &rarr; <span style="color:#6b7280;">taskflow/tests/test_task_model.py, taskflow/tests/test_task_service.py, taskflow/tests/test_auth_service.py, taskflow/te</span><br>
+  <span style="color:#374151;font-style:italic;">All four test files added here. Diffs show complete test coverage of model, service, auth, and event bus components. Pagination test verifies the corr</span>
+</div>
+<div style="font-size:12px;background:#f7f8fa;border:1px solid #e5e7eb;
+            border-radius:4px;padding:8px 12px;margin:4px 0;">
+  <code style="color:#374151;">c5040fb5</code>
+  &rarr; <span style="color:#6b7280;">requirements.txt</span><br>
+  <span style="color:#374151;font-style:italic;">pytest==7.4.0 added to requirements.txt in this earlier commit, two commits before the test files. This establishes pytest was prepared before tests w</span>
+</div></div>
+    </details>
+  </div>
+</div>
+<div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;
+            margin-bottom:20px;overflow:hidden;">
+  <div style="background:#1e3a5f;padding:12px 20px;display:flex;
+              align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+    <div>
+      <span style="color:rgba(255,255,255,0.6);font-size:11px;">
+        why_8
+      </span>
+      <h3 style="margin:2px 0 0;color:#fff;font-size:16px;">Login rate limiting and registration input validation</h3>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">HIGH</span>
+      <code style="font-size:11px;background:#f3f4f6;padding:1px 6px;border-radius:4px;">a2116ca9</code>
+    </div>
+  </div>
+  <div style="padding:16px 20px;">
+    
+<div style="background:#e0f2fe;border-left:3px solid #0369a1;border-radius:0 6px 6px 0;
+            padding:10px 14px;margin:6px 0;">
+  <div style="font-size:11px;font-weight:700;color:#0369a1;margin-bottom:4px;">&#128269; Observed Change</div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">taskflow/security/rate_limiter.py was added: RateLimiter class with MAX_ATTEMPTS=5, LOCKOUT_SECONDS=300 (5 minutes); record_failure(key) appends time.monotonic() timestamps; is_locked(key) returns True when recent failure count &gt;= MAX_ATTEMPTS; clear(key) removes the key on successful login; module-level singleton rate_limiter. taskflow/api/auth.py was modified (+26 lines, -1 line): rate_limiter imported; login() now calls is_locked() before authentication and returns HTTP 429 with message &#x27;Too many failed attempts — try again later&#x27; when locked; record_failure() called on PermissionError; cle...</p>
+</div>
+    
+<div style="background:#f0fdf4;border-left:3px solid #15803d;border-radius:0 6px 6px 0;
+            padding:10px 14px;margin:6px 0;">
+  <div style="font-size:11px;font-weight:700;color:#15803d;margin-bottom:4px;">&#128172; Stated Intent</div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">The commit message states: &#x27;security: add login rate limiter (max 5 attempts / 5 min) and input length validation on registration&#x27;. The &#x27;security:&#x27; prefix classifies this explicitly as a security change. The message names the specific policy: 5 attempts per 5 minutes. README.md explicitly documents &#x27;Token-based authentication with brute-force rate limiting&#x27; and &#x27;Input validation on all endpoints&#x27; as features — this is a repository-observable statement of what was intended to be user-visible.</p>
+</div>
+    
+<div style="background:#faf5ff;border-left:3px solid #7c3aed;border-radius:0 6px 6px 0;
+            padding:10px 14px;margin:6px 0;">
+  <div style="font-size:11px;font-weight:700;color:#7c3aed;margin-bottom:4px;">&#129300; [INFERENCE] Evidence-Based</div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">[INFERENCE] The parameter values (MAX_ATTEMPTS=5, LOCKOUT_SECONDS=300) are consistent with commonly documented brute-force mitigation thresholds, but the repository contains no document, comment, or reference that explains why these specific values were chosen. The input length limits (64 / 254 / 128) correspond to conventional web field limits — 254 characters matches the RFC 5321 maximum email address length — suggesting awareness of standards, but no reference to any RFC or standard appears in the code or commit. The fact that this commit arrives as the final commit in the repository, after...</p>
+</div>
+    
+<div style="background:#fff7ed;border-left:3px solid #c2410c;border-radius:0 6px 6px 0;
+            padding:10px 14px;margin:6px 0;">
+  <div style="font-size:11px;font-weight:700;color:#c2410c;margin-bottom:4px;">&#10067; Unknown</div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">The repository contains no evidence explaining: (1) what triggered the security hardening — no vulnerability report, no security review note, and no external reference is present; (2) why the rate limiter is in-memory rather than persistent — an in-memory rate limiter does not survive server restarts, but no comment acknowledges this limitation; (3) why 5 attempts / 5 minutes specifically; (4) why input validation was not added when the register() endpoint was first written in c5040fb; (5) whether the security changes were added in response to a specific concern or as a proactive measure — ins...</p>
+</div>
+    <details style="margin-top:10px;">
+      <summary style="cursor:pointer;font-size:12px;color:#6b7280;">
+        Evidence commits (1)
+      </summary>
+      <div style="margin-top:6px;">
+<div style="font-size:12px;background:#f7f8fa;border:1px solid #e5e7eb;
+            border-radius:4px;padding:8px 12px;margin:4px 0;">
+  <code style="color:#374151;">a2116ca9</code>
+  &rarr; <span style="color:#6b7280;">taskflow/security/rate_limiter.py, taskflow/api/auth.py, README.md</span><br>
+  <span style="color:#374151;font-style:italic;">All changes in this commit. Diff of rate_limiter.py shows MAX_ATTEMPTS=5 and LOCKOUT_SECONDS=300 constants. Diff of auth.py shows 429 response and is_</span>
+</div></div>
+    </details>
+  </div>
+</div>
+
+
+<div style="border-left:4px solid #3b82d4;padding:4px 0 4px 16px;margin-bottom:24px;">
+  <h2 style="margin:0;font-size:22px;color:#1f2328;">&#127963; Current Architecture</h2>
+  <p style="color:#6b7280;margin:4px 0 0;font-size:14px;">Established from repository evidence — relationships marked [NOT WIRED] exist in code but are unconnected</p>
+</div>
+<div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;
+            padding:24px;margin-bottom:32px;">
+  <div style="background:#0f172a;border-radius:8px;padding:20px 24px;
+              font-family:monospace;font-size:13px;color:#94a3b8;line-height:1.9;
+              overflow-x:auto;">
+    <span style="color:#38bdf8;">main.py</span> &rarr; create_app() &rarr; Flask app.run(0.0.0.0:5000)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&#9500; <span style="color:#a78bfa;">/api/auth</span>&nbsp;&nbsp;&nbsp;(register / login / logout)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&#9500; <span style="color:#a78bfa;">/api/tasks</span>&nbsp;&nbsp;(CRUD &mdash; all @require_token)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&#9474;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&rarr; auth_middleware &rarr; AuthService<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&#9500; <span style="color:#34d399;">TaskService</span> (in-memory dict) &rarr; EventBus &rarr; NotificationService<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&#9500; <span style="color:#fbbf24;">RateLimiter</span> (in-memory, 5 attempts / 300s)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&#9492; <span style="color:#f87171;">[NOT WIRED]</span> TaskRepository / UserRepository &rarr; SQLite<br>
+  </div>
+  <div style="background:#fff3cd;border:1px solid #ffc107;border-radius:6px;
+              padding:12px 16px;margin-top:16px;">
+    <strong>&#9888; Important:</strong>
+    <code>TaskRepository</code> and <code>UserRepository</code> exist in the codebase
+    but <strong>TaskService never uses them</strong>. TaskService uses an in-memory
+    Python dict throughout the entire 10-commit repository history.
+    All task data is lost on every server restart.
+    Evidence: commit <code>c8491ae</code> adds repositories; no subsequent commit
+    wires them into TaskService. Source: <em>why_analysis.json why_2</em>.
+  </div>
+  <table style="width:100%;border-collapse:collapse;margin-top:20px;font-size:13px;">
+    <thead>
+      <tr style="background:#f7f8fa;border-bottom:2px solid #e5e7eb;">
+        <th style="text-align:left;padding:8px 12px;color:#374151;">Component</th>
+        <th style="text-align:left;padding:8px 12px;color:#374151;">File</th>
+        <th style="text-align:left;padding:8px 12px;color:#374151;">Role</th>
+        <th style="text-align:left;padding:8px 12px;color:#374151;">Introduced</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:8px 12px;font-weight:500;">Task domain model</td><td style="padding:8px 12px;font-family:monospace;font-size:12px;color:#374151;">taskflow/models/task.py</td><td style="padding:8px 12px;color:#6b7280;">Core entity; status/priority enums; validation</td><td style="padding:8px 12px;font-family:monospace;font-size:11px;"><code style="background:#f3f4f6;padding:1px 5px;border-radius:3px;">1d9e8be</code></td></tr><tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:8px 12px;font-weight:500;">TaskService</td><td style="padding:8px 12px;font-family:monospace;font-size:12px;color:#374151;">taskflow/services/task_service.py</td><td style="padding:8px 12px;color:#6b7280;">In-memory CRUD + EventBus publish calls</td><td style="padding:8px 12px;font-family:monospace;font-size:11px;"><code style="background:#f3f4f6;padding:1px 5px;border-radius:3px;">1d9e8be</code></td></tr><tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:8px 12px;font-weight:500;">User model</td><td style="padding:8px 12px;font-family:monospace;font-size:12px;color:#374151;">taskflow/models/user.py</td><td style="padding:8px 12px;color:#6b7280;">Auth identity; role field (admin|member)</td><td style="padding:8px 12px;font-family:monospace;font-size:11px;"><code style="background:#f3f4f6;padding:1px 5px;border-radius:3px;">967b11a</code></td></tr><tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:8px 12px;font-weight:500;">AuthService</td><td style="padding:8px 12px;font-family:monospace;font-size:12px;color:#374151;">taskflow/services/auth_service.py</td><td style="padding:8px 12px;color:#6b7280;">SHA-256 hashing; token issuance; require_admin()</td><td style="padding:8px 12px;font-family:monospace;font-size:11px;"><code style="background:#f3f4f6;padding:1px 5px;border-radius:3px;">967b11a</code></td></tr><tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:8px 12px;font-weight:500;">DB layer</td><td style="padding:8px 12px;font-family:monospace;font-size:12px;color:#374151;">taskflow/db.py</td><td style="padding:8px 12px;color:#6b7280;">SQLite connection manager; schema DDL</td><td style="padding:8px 12px;font-family:monospace;font-size:11px;"><code style="background:#f3f4f6;padding:1px 5px;border-radius:3px;">c8491ae</code></td></tr><tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:8px 12px;font-weight:500;">TaskRepository</td><td style="padding:8px 12px;font-family:monospace;font-size:12px;color:#374151;">taskflow/models/task_repository.py</td><td style="padding:8px 12px;color:#6b7280;">SQLite persistence — NOT WIRED to TaskService</td><td style="padding:8px 12px;font-family:monospace;font-size:11px;"><code style="background:#f3f4f6;padding:1px 5px;border-radius:3px;">c8491ae</code></td></tr><tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:8px 12px;font-weight:500;">UserRepository</td><td style="padding:8px 12px;font-family:monospace;font-size:12px;color:#374151;">taskflow/models/user_repository.py</td><td style="padding:8px 12px;color:#6b7280;">SQLite persistence — NOT WIRED</td><td style="padding:8px 12px;font-family:monospace;font-size:11px;"><code style="background:#f3f4f6;padding:1px 5px;border-radius:3px;">c8491ae</code></td></tr><tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:8px 12px;font-weight:500;">App factory</td><td style="padding:8px 12px;font-family:monospace;font-size:12px;color:#374151;">taskflow/app.py</td><td style="padding:8px 12px;color:#6b7280;">Flask wiring; DB init; service boot</td><td style="padding:8px 12px;font-family:monospace;font-size:11px;"><code style="background:#f3f4f6;padding:1px 5px;border-radius:3px;">c5040fb</code></td></tr><tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:8px 12px;font-weight:500;">API — tasks</td><td style="padding:8px 12px;font-family:monospace;font-size:12px;color:#374151;">taskflow/api/tasks.py</td><td style="padding:8px 12px;color:#6b7280;">REST endpoints for task CRUD</td><td style="padding:8px 12px;font-family:monospace;font-size:11px;"><code style="background:#f3f4f6;padding:1px 5px;border-radius:3px;">c5040fb</code></td></tr><tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:8px 12px;font-weight:500;">API — auth</td><td style="padding:8px 12px;font-family:monospace;font-size:12px;color:#374151;">taskflow/api/auth.py</td><td style="padding:8px 12px;color:#6b7280;">Registration, login, logout; rate-limit integration</td><td style="padding:8px 12px;font-family:monospace;font-size:11px;"><code style="background:#f3f4f6;padding:1px 5px;border-radius:3px;">c5040fb / a2116ca</code></td></tr><tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:8px 12px;font-weight:500;">Auth middleware</td><td style="padding:8px 12px;font-family:monospace;font-size:12px;color:#374151;">taskflow/api/auth_middleware.py</td><td style="padding:8px 12px;color:#6b7280;">@require_token decorator (X-Auth-Token header)</td><td style="padding:8px 12px;font-family:monospace;font-size:11px;"><code style="background:#f3f4f6;padding:1px 5px;border-radius:3px;">c5040fb</code></td></tr><tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:8px 12px;font-weight:500;">EventBus</td><td style="padding:8px 12px;font-family:monospace;font-size:12px;color:#374151;">taskflow/events.py</td><td style="padding:8px 12px;color:#6b7280;">Pub/sub dispatcher; exceptions swallowed</td><td style="padding:8px 12px;font-family:monospace;font-size:11px;"><code style="background:#f3f4f6;padding:1px 5px;border-radius:3px;">c434a6f</code></td></tr><tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:8px 12px;font-weight:500;">NotificationService</td><td style="padding:8px 12px;font-family:monospace;font-size:12px;color:#374151;">taskflow/services/notification_service.py</td><td style="padding:8px 12px;color:#6b7280;">Subscribes to task events; in-process activity log</td><td style="padding:8px 12px;font-family:monospace;font-size:11px;"><code style="background:#f3f4f6;padding:1px 5px;border-radius:3px;">c434a6f</code></td></tr><tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:8px 12px;font-weight:500;">RateLimiter</td><td style="padding:8px 12px;font-family:monospace;font-size:12px;color:#374151;">taskflow/security/rate_limiter.py</td><td style="padding:8px 12px;color:#6b7280;">In-memory brute-force protection (no restart persistence)</td><td style="padding:8px 12px;font-family:monospace;font-size:11px;"><code style="background:#f3f4f6;padding:1px 5px;border-radius:3px;">a2116ca</code></td></tr><tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:8px 12px;font-weight:500;">Tests (34)</td><td style="padding:8px 12px;font-family:monospace;font-size:12px;color:#374151;">taskflow/tests/test_*.py</td><td style="padding:8px 12px;color:#6b7280;">pytest suite; covers model/service/auth/eventbus only</td><td style="padding:8px 12px;font-family:monospace;font-size:11px;"><code style="background:#f3f4f6;padding:1px 5px;border-radius:3px;">af36d82</code></td></tr>
+    </tbody>
+  </table>
+</div>
+
+
+<div style="border-left:4px solid #3b82d4;padding:4px 0 4px 16px;margin-bottom:24px;">
+  <h2 style="margin:0;font-size:22px;color:#1f2328;">&#9888; Known Issues and Caveats</h2>
+  <p style="color:#6b7280;margin:4px 0 0;font-size:14px;">Repository-supported limitations only — no invented issues</p>
+</div>
+<div style="margin-bottom:32px;">
+<div style="background:#fee2e2;border-left:4px solid #dc2626;border-radius:0 8px 8px 0;
+            padding:14px 18px;margin-bottom:12px;">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+    <span>&#128308;</span>
+    <strong style="color:#dc2626;font-size:14px;">Repositories Not Wired to TaskService</strong>
+    <code style="font-size:11px;background:rgba(0,0,0,0.06);padding:1px 6px;
+                 border-radius:3px;color:#374151;">c8491ae</code>
+  </div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">TaskRepository and UserRepository were added in commit c8491ae but TaskService continues using an in-memory dict throughout the entire history. All task data is lost on restart. Whether this is a planned migration or deliberate staging is unknown.</p>
+</div>
+<div style="background:#fff7ed;border-left:4px solid #c2410c;border-radius:0 8px 8px 0;
+            padding:14px 18px;margin-bottom:12px;">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+    <span>&#128993;</span>
+    <strong style="color:#c2410c;font-size:14px;">Pagination Bug Was Committed</strong>
+    <code style="font-size:11px;background:rgba(0,0,0,0.06);padding:1px 6px;
+                 border-radius:3px;color:#374151;">861190a / a4544f2</code>
+  </div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">Commit 861190a committed pagination code containing an explicit # BUG: comment describing the off-by-one error. Commit a4544f2 corrected it. The fix is in place; a test in test_task_service.py verifies the corrected formula.</p>
+</div>
+<div style="background:#fff7ed;border-left:4px solid #c2410c;border-radius:0 8px 8px 0;
+            padding:14px 18px;margin-bottom:12px;">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+    <span>&#128993;</span>
+    <strong style="color:#c2410c;font-size:14px;">Test Coverage Gaps</strong>
+    <code style="font-size:11px;background:rgba(0,0,0,0.06);padding:1px 6px;
+                 border-radius:3px;color:#374151;">af36d82</code>
+  </div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">The test suite covers Task model, TaskService, AuthService, and EventBus. Not covered: REST API endpoints, repositories, db.py, rate_limiter.py. No CI configuration exists in the repository.</p>
+</div>
+<div style="background:#fff7ed;border-left:4px solid #c2410c;border-radius:0 8px 8px 0;
+            padding:14px 18px;margin-bottom:12px;">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+    <span>&#128993;</span>
+    <strong style="color:#c2410c;font-size:14px;">In-Memory Rate Limiter Has No Restart Persistence</strong>
+    <code style="font-size:11px;background:rgba(0,0,0,0.06);padding:1px 6px;
+                 border-radius:3px;color:#374151;">a2116ca</code>
+  </div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">The RateLimiter uses time.monotonic() and a plain dict — state is lost on restart. No code comment in the repository acknowledges this limitation.</p>
+</div>
+<div style="background:#f0f9ff;border-left:4px solid #0369a1;border-radius:0 8px 8px 0;
+            padding:14px 18px;margin-bottom:12px;">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+    <span>&#128994;</span>
+    <strong style="color:#0369a1;font-size:14px;">Admin Role Without Admin Endpoints</strong>
+    <code style="font-size:11px;background:rgba(0,0,0,0.06);padding:1px 6px;
+                 border-radius:3px;color:#374151;">967b11a</code>
+  </div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">User.role supports &#x27;admin&#x27;|&#x27;member&#x27; and require_admin() exists in AuthService. No API endpoint in the repository calls require_admin(). The intended admin functionality is unknown.</p>
+</div>
+<div style="background:#f0f9ff;border-left:4px solid #0369a1;border-radius:0 8px 8px 0;
+            padding:14px 18px;margin-bottom:12px;">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+    <span>&#128994;</span>
+    <strong style="color:#0369a1;font-size:14px;">No API Documentation</strong>
+    <code style="font-size:11px;background:rgba(0,0,0,0.06);padding:1px 6px;
+                 border-radius:3px;color:#374151;">c5040fb</code>
+  </div>
+  <p style="margin:0;font-size:13px;color:#374151;line-height:1.6;">No OpenAPI/Swagger spec, no API reference document, and no consumer code exists in the repository. The intended client is unknown.</p>
+</div></div>
+
+
+<div style="border-left:4px solid #3b82d4;padding:4px 0 4px 16px;margin-bottom:24px;">
+  <h2 style="margin:0;font-size:22px;color:#1f2328;">&#128218; Developer Onboarding</h2>
+  <p style="color:#6b7280;margin:4px 0 0;font-size:14px;">Recommended reading order and open investigation questions</p>
+</div>
+<h3 style="font-size:15px;color:#374151;margin:0 0 12px;">Recommended Reading Order</h3>
+<table style="width:100%;border-collapse:collapse;margin-bottom:28px;font-size:13px;">
+  <thead>
+    <tr style="background:#f7f8fa;border-bottom:2px solid #e5e7eb;">
+      <th style="padding:8px 12px;color:#374151;width:40px;">#</th>
+      <th style="padding:8px 12px;color:#374151;">File</th>
+      <th style="padding:8px 12px;color:#374151;">Why Read It First</th>
+    </tr>
+  </thead>
+  <tbody><tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:8px 12px;text-align:center;font-weight:700;color:#3b82d4;font-size:15px;">1</td><td style="padding:8px 12px;font-family:monospace;font-size:12px;color:#374151;">config.py</td><td style="padding:8px 12px;color:#6b7280;font-size:13px;">Version, debug flag, DATABASE_PATH — configuration baseline</td></tr><tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:8px 12px;text-align:center;font-weight:700;color:#3b82d4;font-size:15px;">2</td><td style="padding:8px 12px;font-family:monospace;font-size:12px;color:#374151;">taskflow/models/task.py</td><td style="padding:8px 12px;color:#6b7280;font-size:13px;">Core domain object; VALID_STATUSES; VALID_PRIORITIES; field validation</td></tr><tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:8px 12px;text-align:center;font-weight:700;color:#3b82d4;font-size:15px;">3</td><td style="padding:8px 12px;font-family:monospace;font-size:12px;color:#374151;">taskflow/services/task_service.py</td><td style="padding:8px 12px;color:#6b7280;font-size:13px;">Primary service; all task operations; currently in-memory</td></tr><tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:8px 12px;text-align:center;font-weight:700;color:#3b82d4;font-size:15px;">4</td><td style="padding:8px 12px;font-family:monospace;font-size:12px;color:#374151;">taskflow/models/user.py</td><td style="padding:8px 12px;color:#6b7280;font-size:13px;">User identity; role field used by AuthService</td></tr><tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:8px 12px;text-align:center;font-weight:700;color:#3b82d4;font-size:15px;">5</td><td style="padding:8px 12px;font-family:monospace;font-size:12px;color:#374151;">taskflow/services/auth_service.py</td><td style="padding:8px 12px;color:#6b7280;font-size:13px;">Password hashing scheme; token lifecycle; require_admin()</td></tr><tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:8px 12px;text-align:center;font-weight:700;color:#3b82d4;font-size:15px;">6</td><td style="padding:8px 12px;font-family:monospace;font-size:12px;color:#374151;">taskflow/db.py</td><td style="padding:8px 12px;color:#6b7280;font-size:13px;">SQLite connection manager; DDL schema; read before repositories</td></tr><tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:8px 12px;text-align:center;font-weight:700;color:#3b82d4;font-size:15px;">7</td><td style="padding:8px 12px;font-family:monospace;font-size:12px;color:#374151;">task_repository.py + user_repository.py</td><td style="padding:8px 12px;color:#6b7280;font-size:13px;">SQLite persistence — structurally present but NOT WIRED to TaskService</td></tr><tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:8px 12px;text-align:center;font-weight:700;color:#3b82d4;font-size:15px;">8</td><td style="padding:8px 12px;font-family:monospace;font-size:12px;color:#374151;">taskflow/app.py</td><td style="padding:8px 12px;color:#6b7280;font-size:13px;">Application assembly — how all components are wired</td></tr><tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:8px 12px;text-align:center;font-weight:700;color:#3b82d4;font-size:15px;">9</td><td style="padding:8px 12px;font-family:monospace;font-size:12px;color:#374151;">taskflow/api/auth_middleware.py</td><td style="padding:8px 12px;color:#6b7280;font-size:13px;">require_token decorator — prerequisite for reading API endpoints</td></tr><tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:8px 12px;text-align:center;font-weight:700;color:#3b82d4;font-size:15px;">10</td><td style="padding:8px 12px;font-family:monospace;font-size:12px;color:#374151;">taskflow/api/auth.py + tasks.py</td><td style="padding:8px 12px;color:#6b7280;font-size:13px;">HTTP endpoints; rate-limiting integration</td></tr><tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:8px 12px;text-align:center;font-weight:700;color:#3b82d4;font-size:15px;">11</td><td style="padding:8px 12px;font-family:monospace;font-size:12px;color:#374151;">taskflow/events.py + notification_service.py</td><td style="padding:8px 12px;color:#6b7280;font-size:13px;">Event bus pattern; task lifecycle event propagation</td></tr><tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:8px 12px;text-align:center;font-weight:700;color:#3b82d4;font-size:15px;">12</td><td style="padding:8px 12px;font-family:monospace;font-size:12px;color:#374151;">taskflow/security/rate_limiter.py</td><td style="padding:8px 12px;color:#6b7280;font-size:13px;">Brute-force mitigation; understand in-memory limitation</td></tr><tr style="border-bottom:1px solid #f0f0f0;"><td style="padding:8px 12px;text-align:center;font-weight:700;color:#3b82d4;font-size:15px;">13</td><td style="padding:8px 12px;font-family:monospace;font-size:12px;color:#374151;">taskflow/tests/test_*.py</td><td style="padding:8px 12px;color:#6b7280;font-size:13px;">Executable specification — verifiable expected behaviour</td></tr></tbody>
+</table>
+<h3 style="font-size:15px;color:#374151;margin:0 0 12px;">
+  &#128270; Open Investigation Questions
+</h3>
+<p style="font-size:13px;color:#6b7280;margin:0 0 12px;">
+  These are gaps in the repository evidence — questions for the development team, not established facts.
+</p>
+<div style="background:#f7f8fa;border:1px solid #e5e7eb;border-radius:6px;padding:12px 16px;margin-bottom:8px;"><strong style="color:#1f2328;font-size:13px;">&#9675; Why are repositories not wired to TaskService?</strong><p style="margin:4px 0 0;font-size:13px;color:#6b7280;line-height:1.5;">TaskRepository and UserRepository exist since c8491ae. TaskService never uses them. Is the SQLite migration planned? What is the intended approach?</p></div><div style="background:#f7f8fa;border:1px solid #e5e7eb;border-radius:6px;padding:12px 16px;margin-bottom:8px;"><strong style="color:#1f2328;font-size:13px;">&#9675; What client is intended for the REST API?</strong><p style="margin:4px 0 0;font-size:13px;color:#6b7280;line-height:1.5;">No API documentation, OpenAPI spec, or consumer code exists in the repository.</p></div><div style="background:#f7f8fa;border:1px solid #e5e7eb;border-radius:6px;padding:12px 16px;margin-bottom:8px;"><strong style="color:#1f2328;font-size:13px;">&#9675; What does NotificationService send in production?</strong><p style="margin:4px 0 0;font-size:13px;color:#6b7280;line-height:1.5;">Docstring says &#x27;emails / push messages&#x27; but no backend exists. The EventBus is designed for this extension.</p></div><div style="background:#f7f8fa;border:1px solid #e5e7eb;border-radius:6px;padding:12px 16px;margin-bottom:8px;"><strong style="color:#1f2328;font-size:13px;">&#9675; What admin operations were planned?</strong><p style="margin:4px 0 0;font-size:13px;color:#6b7280;line-height:1.5;">require_admin() exists; no endpoint uses it. The admin role was added in c967b11a.</p></div><div style="background:#f7f8fa;border:1px solid #e5e7eb;border-radius:6px;padding:12px 16px;margin-bottom:8px;"><strong style="color:#1f2328;font-size:13px;">&#9675; Should the rate limiter be persistent?</strong><p style="margin:4px 0 0;font-size:13px;color:#6b7280;line-height:1.5;">Current implementation is in-memory — it resets on restart. No CI / deployment config exists.</p></div><div style="background:#f7f8fa;border:1px solid #e5e7eb;border-radius:6px;padding:12px 16px;margin-bottom:8px;"><strong style="color:#1f2328;font-size:13px;">&#9675; What is the test coverage target?</strong><p style="margin:4px 0 0;font-size:13px;color:#6b7280;line-height:1.5;">API endpoints, repositories, and security module have no tests. No CI configuration.</p></div>
+
+
+<div style="border-left:4px solid #3b82d4;padding:4px 0 4px 16px;margin-bottom:24px;">
+  <h2 style="margin:0;font-size:22px;color:#1f2328;">&#128203; Evidence Model</h2>
+  <p style="color:#6b7280;margin:4px 0 0;font-size:14px;">How claims in this report are grounded</p>
+</div>
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:32px;">
+  <div style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:16px 20px;flex:1;min-width:200px;"><div style="font-size:20px;margin-bottom:8px;">&#128337;</div><strong style="font-size:13px;color:#1f2328;">repo_history.json</strong><p style="margin:6px 0 0;font-size:12px;color:#6b7280;line-height:1.5;">Git history extraction: 10 commits, per-file diffs, line stats. No author emails in output.</p></div><div style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:16px 20px;flex:1;min-width:200px;"><div style="font-size:20px;margin-bottom:8px;">&#127942;</div><strong style="font-size:13px;color:#1f2328;">epoch_analysis.json</strong><p style="margin:6px 0 0;font-size:12px;color:#6b7280;line-height:1.5;">5 historical epochs identified by cohesive commit evidence. All confidence: HIGH.</p></div><div style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:16px 20px;flex:1;min-width:200px;"><div style="font-size:20px;margin-bottom:8px;">&#10067;</div><strong style="font-size:13px;color:#1f2328;">why_analysis.json</strong><p style="margin:6px 0 0;font-size:12px;color:#6b7280;line-height:1.5;">8 change analyses. Four-voice structure: observed / stated / [INFERENCE] / unknown.</p></div><div style="background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:16px 20px;flex:1;min-width:200px;"><div style="font-size:20px;margin-bottom:8px;">&#128218;</div><strong style="font-size:13px;color:#1f2328;">onboarding_guide.md</strong><p style="margin:6px 0 0;font-size:12px;color:#6b7280;line-height:1.5;">Developer guide generated from the above. All claims traceable to commit hashes.</p></div>
+</div>
+<div style="background:#f7f8fa;border:1px solid #e5e7eb;border-radius:8px;
+            padding:16px 20px;margin-bottom:32px;">
+  <table style="width:100%;border-collapse:collapse;font-size:13px;">
+    <thead>
+      <tr style="border-bottom:1px solid #e5e7eb;">
+        <th style="text-align:left;padding:6px 12px;color:#374151;">Rating</th>
+        <th style="text-align:left;padding:6px 12px;color:#374151;">Meaning</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td style="padding:6px 12px;"><span style="background:#10b981;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">HIGH</span></td>
+          <td style="padding:6px 12px;color:#6b7280;font-size:12px;">
+          Multiple independent sources (commit message + diff + file changes) agree</td></tr>
+      <tr><td style="padding:6px 12px;"><span style="background:#f59e0b;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">MEDIUM</span></td>
+          <td style="padding:6px 12px;color:#6b7280;font-size:12px;">
+          Evidence present but partial or ambiguous</td></tr>
+      <tr><td style="padding:6px 12px;"><span style="background:#ef4444;color:#fff;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;">LOW</span></td>
+          <td style="padding:6px 12px;color:#6b7280;font-size:12px;">
+          Sparse evidence; heavily inference-dependent</td></tr>
+    </tbody>
+  </table>
+  <p style="margin:12px 0 0;font-size:12px;color:#6b7280;">
+    All 13 analyses in this report (5 epochs + 8 change analyses) carry <strong>HIGH</strong> confidence.
+    Author email addresses are never included in any output.
+    Developer intent beyond what is explicitly stated in commit messages, code comments,
+    or README.md cannot be established from this repository.
+  </p>
+</div>
+
+<div style="text-align:center;padding:24px;border-top:1px solid #e5e7eb;
+            margin-top:40px;color:#9ca3af;font-size:12px;">
+  Codebase Time Machine &nbsp;&middot;&nbsp; IBM Bob 2.0 Hackathon
+  &nbsp;&middot;&nbsp; Generated 2026-09-27 03:26 UTC
+  &nbsp;&middot;&nbsp; All claims traceable to repository evidence
+</div>
+  </div>
+</body>
+</html>

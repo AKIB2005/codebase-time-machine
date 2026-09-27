@@ -1,0 +1,326 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-09-27T02:48:25.269515+00:00",
+  "analyzer": "epoch_analyzer v1.0",
+  "source_file": "output/repo_history.json",
+  "repository_summary": {
+    "total_commits": 10,
+    "total_epochs_found": 5,
+    "date_range": {
+      "first": "2026-09-27T00:25:47+05:30",
+      "last": "2026-09-27T00:31:59+05:30"
+    },
+    "all_contributors": [
+      "TaskFlow Dev"
+    ],
+    "total_files_touched": 29
+  },
+  "epochs": [
+    {
+      "epoch_id": "epoch_1",
+      "name": "Foundation and Domain Bootstrap",
+      "summary": "The project skeleton was created and the core Task domain model with in-memory CRUD operations was established, forming the entire basis for subsequent development.",
+      "commit_hashes": [
+        "79b1b0cea9500ab137a46fdcabe016de40f3327a",
+        "1d9e8be0b788b939c4a3540bc98ec4121a86743b"
+      ],
+      "start_commit": "79b1b0cea9500ab137a46fdcabe016de40f3327a",
+      "end_commit": "1d9e8be0b788b939c4a3540bc98ec4121a86743b",
+      "key_files": [
+        ".gitignore",
+        "README.md",
+        "config.py",
+        "main.py",
+        "requirements.txt",
+        "taskflow/models/task.py",
+        "taskflow/services/task_service.py"
+      ],
+      "observed_changes": [
+        {
+          "description": "Project scaffold committed: README.md, config.py (VERSION=0.1.0), main.py (bare entry point), requirements.txt (flask==2.3.2, Werkzeug==2.3.6), .gitignore, and empty __init__.py files for taskflow/, api/, models/, services/, tests/ packages.",
+          "evidence_commits": [
+            "79b1b0cea9500ab137a46fdcabe016de40f3327a"
+          ],
+          "evidence_type": "file_addition"
+        },
+        {
+          "description": "Task domain model added (taskflow/models/task.py): Task class with task_id, title, description, assignee, priority, status, created_at, updated_at fields; VALID_STATUSES = ('todo', 'in_progress', 'done'); VALID_PRIORITIES = ('low', 'medium', 'high'); update() method with field validation; to_dict() method.",
+          "evidence_commits": [
+            "1d9e8be0b788b939c4a3540bc98ec4121a86743b"
+          ],
+          "evidence_type": "diff"
+        },
+        {
+          "description": "TaskService added (taskflow/services/task_service.py): in-memory dict-backed CRUD — create_task, get_task, list_tasks (with optional status filter), update_task, delete_task, __len__.",
+          "evidence_commits": [
+            "1d9e8be0b788b939c4a3540bc98ec4121a86743b"
+          ],
+          "evidence_type": "file_addition"
+        },
+        {
+          "description": "main.py updated to import TaskService and demonstrate task creation, update, and listing via console output (script-mode execution).",
+          "evidence_commits": [
+            "1d9e8be0b788b939c4a3540bc98ec4121a86743b"
+          ],
+          "evidence_type": "diff"
+        }
+      ],
+      "inferred_theme": {
+        "label": "Domain-first incremental build",
+        "explanation": "The repository was built domain-first: the skeleton and core business object were established before any persistence or network layer was introduced. This is inference based on commit ordering and the absence of any storage or HTTP code in these commits.",
+        "basis": "Commit 79b1b0c adds only scaffolding with no logic. Commit 1d9e8be adds only domain model and service with in-memory storage — no db.py, no Flask imports, no routes."
+      },
+      "confidence": "HIGH",
+      "uncertainty_notes": null,
+      "epoch_stats": {
+        "commit_count": 2,
+        "lines_added": 161,
+        "lines_deleted": 0
+      }
+    },
+    {
+      "epoch_id": "epoch_2",
+      "name": "Vertical Feature Build-Out: Auth, Persistence, and HTTP API",
+      "summary": "Three consecutive feature commits transformed the bare domain model into a deployable service by adding user authentication with hashed passwords, SQLite-backed persistence, and a full Flask REST API with token-based auth middleware.",
+      "commit_hashes": [
+        "967b11aa401d9af69818505d13058740511c382b",
+        "c8491ae3c8e596ce97a73cf03e4c9d8d0cfbca76",
+        "c5040fb5f6edadbb878421e6a35e789eef0592ce"
+      ],
+      "start_commit": "967b11aa401d9af69818505d13058740511c382b",
+      "end_commit": "c5040fb5f6edadbb878421e6a35e789eef0592ce",
+      "key_files": [
+        "config.py",
+        "main.py",
+        "requirements.txt",
+        "taskflow/api/auth.py",
+        "taskflow/api/auth_middleware.py",
+        "taskflow/api/tasks.py",
+        "taskflow/app.py",
+        "taskflow/db.py",
+        "taskflow/models/task_repository.py",
+        "taskflow/models/user.py",
+        "taskflow/models/user_repository.py",
+        "taskflow/services/auth_service.py"
+      ],
+      "observed_changes": [
+        {
+          "description": "User model added (taskflow/models/user.py): User class with user_id, username, email, password_hash, role ('admin'|'member'), is_active fields. config.py updated to VERSION=0.2.0 and SESSION_TOKEN_LENGTH=32 constant added.",
+          "evidence_commits": [
+            "967b11aa401d9af69818505d13058740511c382b"
+          ],
+          "evidence_type": "file_addition"
+        },
+        {
+          "description": "AuthService added (taskflow/services/auth_service.py): SHA-256 password hashing with a random 16-byte hex salt (using secrets.token_hex), login returning a secrets.token_urlsafe(32) session token, logout, get_user_by_token, require_admin.",
+          "evidence_commits": [
+            "967b11aa401d9af69818505d13058740511c382b"
+          ],
+          "evidence_type": "diff"
+        },
+        {
+          "description": "SQLite persistence layer added: taskflow/db.py (connection context manager with PRAGMA foreign_keys=ON, rollback on exception, initialize_db() creating 'users' and 'tasks' tables with CREATE TABLE IF NOT EXISTS DDL). DATABASE_PATH config key added; config.py updated to VERSION=0.3.0.",
+          "evidence_commits": [
+            "c8491ae3c8e596ce97a73cf03e4c9d8d0cfbca76"
+          ],
+          "evidence_type": "file_addition"
+        },
+        {
+          "description": "TaskRepository (taskflow/models/task_repository.py) and UserRepository (taskflow/models/user_repository.py) added: both use get_connection() context manager and implement INSERT...ON CONFLICT DO UPDATE (upsert) patterns.",
+          "evidence_commits": [
+            "c8491ae3c8e596ce97a73cf03e4c9d8d0cfbca76"
+          ],
+          "evidence_type": "file_addition"
+        },
+        {
+          "description": "Flask REST API introduced: taskflow/api/tasks.py (Blueprint at /api/tasks — GET, POST, GET/:id, PATCH/:id, DELETE/:id), taskflow/api/auth.py (Blueprint at /api/auth — /register, /login, /logout), taskflow/api/auth_middleware.py (require_token decorator checking X-Auth-Token header). Application factory taskflow/app.py created. pytest added to requirements.txt.",
+          "evidence_commits": [
+            "c5040fb5f6edadbb878421e6a35e789eef0592ce"
+          ],
+          "evidence_type": "file_addition"
+        },
+        {
+          "description": "main.py replaced: removed script-mode task creation demo; now delegates to create_app() and calls app.run(host='0.0.0.0', port=5000). All 15 lines of demo code removed.",
+          "evidence_commits": [
+            "c5040fb5f6edadbb878421e6a35e789eef0592ce"
+          ],
+          "evidence_type": "diff"
+        }
+      ],
+      "inferred_theme": {
+        "label": "Layered service assembly",
+        "explanation": "Each commit in this epoch added one complete vertical layer (identity, persistence, HTTP) in isolation before the next. This is inference about development strategy; the evidence shows sequence but does not confirm the ordering was intentional.",
+        "basis": "967b11a introduces no db or HTTP code; c8491ae introduces db but no HTTP routes; c5040fb introduces routes but adds no new domain model files. The strict layering visible in the diffs supports this interpretation."
+      },
+      "confidence": "HIGH",
+      "uncertainty_notes": null,
+      "epoch_stats": {
+        "commit_count": 3,
+        "lines_added": 449,
+        "lines_deleted": 17
+      }
+    },
+    {
+      "epoch_id": "epoch_3",
+      "name": "Pagination Bug Introduction and Correction",
+      "summary": "A pagination feature was added to list_tasks with a defective off-by-one start-index expression. The immediately following commit corrected the expression. Both commits affected only taskflow/services/task_service.py.",
+      "commit_hashes": [
+        "861190af963b6b26b0e85fcc08dca57c9f3be8b8",
+        "a4544f2bb15332f235eaf7526544e9e5716b8389"
+      ],
+      "start_commit": "861190af963b6b26b0e85fcc08dca57c9f3be8b8",
+      "end_commit": "a4544f2bb15332f235eaf7526544e9e5716b8389",
+      "key_files": [
+        "taskflow/services/task_service.py"
+      ],
+      "observed_changes": [
+        {
+          "description": "Commit 861190a added PAGE_SIZE=20 constant and a 'page: int=1' parameter to list_tasks(). The pagination start expression written was: 'start = page * PAGE_SIZE - PAGE_SIZE + 1'. The diff itself contains a comment marked '# BUG:' explaining that the formula should be '(page - 1) * PAGE_SIZE' but instead uses 'page * PAGE_SIZE', causing the first item of every page to be silently skipped.",
+          "evidence_commits": [
+            "861190af963b6b26b0e85fcc08dca57c9f3be8b8"
+          ],
+          "evidence_type": "diff"
+        },
+        {
+          "description": "Commit a4544f2 removed the three lines containing the buggy formula and its comment, replacing them with a single line: 'start = (page - 1) * PAGE_SIZE'. Net change: +1 line, -3 lines in task_service.py. No other files were changed.",
+          "evidence_commits": [
+            "a4544f2bb15332f235eaf7526544e9e5716b8389"
+          ],
+          "evidence_type": "diff"
+        }
+      ],
+      "inferred_theme": {
+        "label": "Feature defect and immediate repair",
+        "explanation": "The BUG comment in commit 861190a was present at commit time, suggesting the defect was either recognised during code review or noted for immediate correction. The fix followed within seconds of wall-clock time based on timestamps. This is an inference about authoring intent; the evidence shows only what the diffs contain.",
+        "basis": "Commit message of 861190a does not contain 'bug' or 'fix' wording — it reads as a normal feature commit — but the diff itself contains an explicit '# BUG:' annotation. Commit a4544f2 message begins with 'fix:' and the diff exactly removes those annotated lines."
+      },
+      "confidence": "HIGH",
+      "uncertainty_notes": null,
+      "epoch_stats": {
+        "commit_count": 2,
+        "lines_added": 8,
+        "lines_deleted": 5
+      }
+    },
+    {
+      "epoch_id": "epoch_4",
+      "name": "Architectural Decoupling via Event Bus",
+      "summary": "A single refactor commit introduced a publish/subscribe EventBus and a NotificationService, removing hardwired side-effect coupling from TaskService. No new user-visible functionality was added.",
+      "commit_hashes": [
+        "c434a6f640d90d9c198395bf09e7f4b7b863aac2"
+      ],
+      "start_commit": "c434a6f640d90d9c198395bf09e7f4b7b863aac2",
+      "end_commit": "c434a6f640d90d9c198395bf09e7f4b7b863aac2",
+      "key_files": [
+        "taskflow/app.py",
+        "taskflow/events.py",
+        "taskflow/services/notification_service.py",
+        "taskflow/services/task_service.py"
+      ],
+      "observed_changes": [
+        {
+          "description": "taskflow/events.py added: EventBus class with subscribe(event, handler) and publish(event, payload) methods; handler exceptions are caught and logged but do not propagate to the caller; a module-level singleton 'bus = EventBus()' created.",
+          "evidence_commits": [
+            "c434a6f640d90d9c198395bf09e7f4b7b863aac2"
+          ],
+          "evidence_type": "file_addition"
+        },
+        {
+          "description": "taskflow/services/notification_service.py added: NotificationService subscribes to 'task.created', 'task.updated', 'task.deleted' events on the bus at __init__ time and appends structured log entries; docstring states 'In a production system this would send emails / push messages'.",
+          "evidence_commits": [
+            "c434a6f640d90d9c198395bf09e7f4b7b863aac2"
+          ],
+          "evidence_type": "file_addition"
+        },
+        {
+          "description": "taskflow/services/task_service.py modified: module docstring updated to state 'Architectural change: side-effects (notifications, audit) are now decoupled via the EventBus'; bus.publish() calls injected in create_task, update_task, and delete_task. Net diff: +10 lines, -2 lines.",
+          "evidence_commits": [
+            "c434a6f640d90d9c198395bf09e7f4b7b863aac2"
+          ],
+          "evidence_type": "diff"
+        },
+        {
+          "description": "taskflow/app.py modified: NotificationService imported and instantiated at application startup via app.extensions['notifications'] = NotificationService() with inline comment 'Boot the notification service so it subscribes to the event bus'.",
+          "evidence_commits": [
+            "c434a6f640d90d9c198395bf09e7f4b7b863aac2"
+          ],
+          "evidence_type": "diff"
+        }
+      ],
+      "inferred_theme": {
+        "label": "Observer-pattern decoupling",
+        "explanation": "The refactor applies an observer/event-bus pattern to break direct coupling between TaskService and its consumers. The code's own docstring labels this an 'Architectural change', which is consistent with the structural changes visible in the diff. Calling this 'intentional design improvement' is an inference supported by the docstring wording, but the underlying motivation is not independently verifiable from the repository evidence.",
+        "basis": "task_service.py docstring explicitly reads 'Architectural change: side-effects … now decoupled via the EventBus'. NotificationService docstring explicitly states 'In a production system this would send emails / push messages', indicating awareness of future extensibility."
+      },
+      "confidence": "HIGH",
+      "uncertainty_notes": null,
+      "epoch_stats": {
+        "commit_count": 1,
+        "lines_added": 88,
+        "lines_deleted": 2
+      }
+    },
+    {
+      "epoch_id": "epoch_5",
+      "name": "Quality Assurance and Security Hardening",
+      "summary": "A pytest test suite (34 test cases across 4 files) was added covering the Task model, TaskService, AuthService, and EventBus. A separate security commit added brute-force rate limiting on the login endpoint and input length validation on registration.",
+      "commit_hashes": [
+        "af36d82120d3074b4cc3529954683d2387f8741a",
+        "a2116ca913d10e019c5e4c8e1f96355b7e162ec7"
+      ],
+      "start_commit": "af36d82120d3074b4cc3529954683d2387f8741a",
+      "end_commit": "a2116ca913d10e019c5e4c8e1f96355b7e162ec7",
+      "key_files": [
+        "README.md",
+        "taskflow/api/auth.py",
+        "taskflow/security/rate_limiter.py",
+        "taskflow/tests/test_auth_service.py",
+        "taskflow/tests/test_event_bus.py",
+        "taskflow/tests/test_task_model.py",
+        "taskflow/tests/test_task_service.py"
+      ],
+      "observed_changes": [
+        {
+          "description": "af36d82 added 4 test files (194 lines total) under taskflow/tests/: test_task_model.py (6 test functions covering Task defaults, invalid priority, status update, unknown-field update, to_dict keys), test_task_service.py (8 test functions covering create/retrieve, empty list, status filter, pagination pages 1 and 2, delete, error cases), test_auth_service.py (7 test functions covering register/login, duplicate username, wrong password, unknown user, logout invalidation, admin role), test_event_bus.py (4 test functions covering subscribe/publish, multiple subscribers, no-subscriber safety, handler exception isolation).",
+          "evidence_commits": [
+            "af36d82120d3074b4cc3529954683d2387f8741a"
+          ],
+          "evidence_type": "file_addition"
+        },
+        {
+          "description": "a2116ca added taskflow/security/rate_limiter.py: RateLimiter class tracking failed login attempts per username using time.monotonic(); MAX_ATTEMPTS=5 and LOCKOUT_SECONDS=300 constants; module-level singleton rate_limiter; record_failure, is_locked, and clear methods.",
+          "evidence_commits": [
+            "a2116ca913d10e019c5e4c8e1f96355b7e162ec7"
+          ],
+          "evidence_type": "file_addition"
+        },
+        {
+          "description": "a2116ca modified taskflow/api/auth.py (+26 lines, -1 line): import of rate_limiter added; input length constants added (_MAX_USERNAME=64, _MAX_EMAIL=254, _MAX_PASSWORD=128); register() now validates all three field lengths and enforces minimum password length of 8 characters; login() checks rate_limiter.is_locked() before attempting authentication, records failures with record_failure(), clears on success.",
+          "evidence_commits": [
+            "a2116ca913d10e019c5e4c8e1f96355b7e162ec7"
+          ],
+          "evidence_type": "diff"
+        },
+        {
+          "description": "README.md updated in a2116ca to add two feature bullet points: 'Token-based authentication with brute-force rate limiting' and 'Input validation on all endpoints'.",
+          "evidence_commits": [
+            "a2116ca913d10e019c5e4c8e1f96355b7e162ec7"
+          ],
+          "evidence_type": "diff"
+        }
+      ],
+      "inferred_theme": {
+        "label": "Production readiness investment",
+        "explanation": "The test suite and security hardening together suggest a shift from feature development toward production readiness — adding verifiability (tests) and resistance to abuse (rate limiting). This interpretation is consistent with the evidence but is an inference; the commits themselves do not state this motivation explicitly.",
+        "basis": "af36d82 commit message references 34 test cases, implying comprehensive coverage intent. a2116ca commit message explicitly names 'max 5 attempts / 5 min', suggesting a deliberate security policy. README update in a2116ca also adds user-facing documentation of the security features, consistent with a public-facing hardening pass. All evidence is from commit messages and diffs."
+      },
+      "confidence": "HIGH",
+      "uncertainty_notes": null,
+      "epoch_stats": {
+        "commit_count": 2,
+        "lines_added": 259,
+        "lines_deleted": 1
+      }
+    }
+  ]
+}
